@@ -3,4 +3,7 @@
     <string name="start_service_label">Start Service</string>
     <string name="stop_service_label">Stop Service</string>
     <string name="send_text_label">Send Text</string>
+    <string name="give_notification_label">Give Notification</string>
+    <string name="channel_name">Ping Channel</string>
+    <string name="channel_description">Channel for Ping notifications</string>
 </resources>
