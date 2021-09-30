@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 
 import androidx.annotation.Nullable;
@@ -25,15 +26,6 @@ public class TextService extends Service {
 
     SmsReceiver smsReceiver = new SmsReceiver();
 
-    public TextService() {
-        System.out.println("*** TextService constructor called. ***");
-    }
-
-    @Override
-    public void onCreate() {
-        System.out.println("*** TextService onCreate called. ***");
-    }
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -42,30 +34,30 @@ public class TextService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        System.out.println("Starting Service Command with Intent: " + intent.getAction());
-
+        // Be notified when texts are received.
         registerReceiver(smsReceiver, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
 
+        // Check whether to stop to service.
         String action = intent.getAction();
         if (Objects.equals(action, STOP)) {
             stopSelf();
         }
 
-        //return START_NOT_STICKY;
+        // Keep the service active after activity is closed.
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
-        System.out.println("Service being destroyed.");
         unregisterReceiver(smsReceiver);
     }
 
+    // Class that receives text messages.
     private class SmsReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            System.out.println("*** Message receive callback triggered. ***");
-            String telnr = "", nachricht = "";
+            String number = "";
+            StringBuilder body = new StringBuilder();
 
             Bundle extras = intent.getExtras();
 
@@ -73,19 +65,20 @@ public class TextService extends Service {
                 Object[] pdus = (Object[]) extras.get("pdus");
                 if (pdus != null) {
 
+                    // Get the message details.
                     for (Object pdu : pdus) {
                         SmsMessage smsMessage = getIncomingMessage(pdu, extras);
-                        telnr = smsMessage.getDisplayOriginatingAddress();
-                        nachricht += smsMessage.getDisplayMessageBody();
+                        body.append(smsMessage.getDisplayMessageBody());
+                        number = smsMessage.getOriginatingAddress();
                     }
 
-                    // Here the message content is processed within MainAct
-                    //MainActivity.instance().processSMS(telnr.replace("+49", "0").replace(" ", ""), nachricht);
-                    System.out.println("Received message: " + nachricht);
+                    // Send a reply.
+                    sendText(number);
                 }
             }
         }
 
+        // Get the text message from the raw object.
         private SmsMessage getIncomingMessage(Object object, Bundle bundle) {
             SmsMessage smsMessage;
 
@@ -98,5 +91,35 @@ public class TextService extends Service {
 
             return smsMessage;
         }
+    }
+
+    // Send a reply.
+    private void sendText(String number) {
+        try {
+            SmsManager manager = SmsManager.getDefault();
+            String text = "Ping reply.";
+            manager.sendTextMessage(number, null, text, null, null);
+        }
+        catch (SecurityException e) {
+            System.out.println(e.getLocalizedMessage());
+        }
+    }
+
+    /**
+     * Give a notification to the user.
+     */
+    private void giveNotification() {
+        String title = "Ping Response Sent";
+        String text = "Current location sent via text.";
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, MainActivity.CHANNEL_ID)
+                .setSmallIcon(R.drawable.message_icon)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setPriority(NotificationCompat.PRIORITY_MAX);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+        // notificationId is a unique int for each notification that you must define
+        int notificationId = 1;
+        notificationManager.notify(notificationId, builder.build());
     }
 }

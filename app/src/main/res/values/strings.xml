@@ -6,4 +6,5 @@
     <string name="give_notification_label">Give Notification</string>
     <string name="channel_name">Ping Channel</string>
     <string name="channel_description">Channel for Ping notifications</string>
+    <string name="status_label">Welcome to Ping.</string>
 </resources>
