@@ -46,7 +46,26 @@ public class MainActivity extends AppCompatActivity {
     }
     
     public void onButtonStartServiceClick(View view) {
-        startService(new Intent(this, TextService.class));
+        System.out.println("Trying to start service from activity.");
+        if (ContextCompat.checkSelfPermission(
+                getApplicationContext(), Manifest.permission.READ_SMS) ==
+                PackageManager.PERMISSION_GRANTED) {
+            // You can use the API that requires the permission.
+            startService(new Intent(this, TextService.class));
+        } else if (shouldShowRequestPermissionRationale()) {
+            // In an educational UI, explain to the user why your app requires this
+            // permission for a specific feature to behave as expected. In this UI,
+            // include a "cancel" or "no thanks" button that allows the user to
+            // continue using your app without granting the permission.
+            //showInContextUI(...);
+        } else {
+            // You can directly ask for the permission.
+            // The registered ActivityResultCallback gets the result of this request.
+            // You can directly ask for the permission.
+            ActivityCompat.requestPermissions(this,
+                    new String[] { Manifest.permission.READ_SMS },
+                    REQUEST_CODE);
+        }
     }
 
     public void onButtonStopServiceClick(View view) {
@@ -81,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
+        System.out.println("On request permission result.");
         if (requestCode == REQUEST_CODE) {// If request is cancelled, the result arrays are empty.
             if (grantResults.length > 0 &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {

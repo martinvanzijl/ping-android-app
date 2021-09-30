@@ -1,8 +1,14 @@
 package com.example.myfirstapp;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.telephony.SmsMessage;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -17,6 +23,8 @@ public class TextService extends Service {
 
     public static final String STOP = "STOP";
 
+    SmsReceiver smsReceiver = new SmsReceiver();
+
     public TextService() {
         System.out.println("*** TextService constructor called. ***");
     }
@@ -24,7 +32,6 @@ public class TextService extends Service {
     @Override
     public void onCreate() {
         System.out.println("*** TextService onCreate called. ***");
-        giveNotification();
     }
 
     @Nullable
@@ -35,58 +42,61 @@ public class TextService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        System.out.println("Intent: " + intent.getAction());
+        System.out.println("Starting Service Command with Intent: " + intent.getAction());
+
+        registerReceiver(smsReceiver, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
 
         String action = intent.getAction();
         if (Objects.equals(action, STOP)) {
             stopSelf();
         }
 
-        return START_NOT_STICKY;
+        //return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
         System.out.println("Service being destroyed.");
+        unregisterReceiver(smsReceiver);
     }
 
-    /**
-     * Give a notification to the user.
-     */
-    private void giveNotification() {
-        String CHANNEL_ID = "PingChannel";
-        String textTitle = "Ping Response Sent";
-        String textContent = "Current location sent via text.";
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.notification_icon)
-                .setContentTitle(textTitle)
-                .setContentText(textContent)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+    private class SmsReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            System.out.println("*** Message receive callback triggered. ***");
+            String telnr = "", nachricht = "";
 
-        // notificationId is a unique int for each notification that you must define
-        int notificationId = 0;
-        notificationManager.notify(notificationId, builder.build());
+            Bundle extras = intent.getExtras();
+
+            if (extras != null) {
+                Object[] pdus = (Object[]) extras.get("pdus");
+                if (pdus != null) {
+
+                    for (Object pdu : pdus) {
+                        SmsMessage smsMessage = getIncomingMessage(pdu, extras);
+                        telnr = smsMessage.getDisplayOriginatingAddress();
+                        nachricht += smsMessage.getDisplayMessageBody();
+                    }
+
+                    // Here the message content is processed within MainAct
+                    //MainActivity.instance().processSMS(telnr.replace("+49", "0").replace(" ", ""), nachricht);
+                    System.out.println("Received message: " + nachricht);
+                }
+            }
+        }
+
+        private SmsMessage getIncomingMessage(Object object, Bundle bundle) {
+            SmsMessage smsMessage;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                String format = bundle.getString("format");
+                smsMessage = SmsMessage.createFromPdu((byte[]) object, format);
+            } else {
+                smsMessage = SmsMessage.createFromPdu((byte[]) object);
+            }
+
+            return smsMessage;
+        }
     }
-
-//    /**
-//     * Handler of incoming messages from clients.
-//     */
-//    class IncomingTextMessageHandler extends Handler {
-//        @Override
-//        public void handleMessage(Message msg) {
-////            sendNotification(1, "This is a sample message", "John Doe",
-////                    System.currentTimeMillis());
-//            Message reply = new Message();
-//            final boolean result = sendMessage(reply);
-//        }
-//    }
-
-//    private void sendReply() {
-//        SmsManager manager = SmsManager.getDefault();
-//        String dest = "555 1234";
-//        String source = "555 1234";
-//        String text = "Ping reply.";
-//        manager.sendTextMessage(dest, source, text, null, null);
-//    }
 }
