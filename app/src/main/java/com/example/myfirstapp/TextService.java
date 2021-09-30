@@ -18,12 +18,17 @@ import androidx.core.app.NotificationManagerCompat;
 import java.util.Objects;
 
 /**
- * Reads text messages.
+ * Reads text messages and sends response.
  */
 public class TextService extends Service {
 
+    // Command to stop the service.
     public static final String STOP = "STOP";
 
+    // Hack to let activity know about status.
+    private static boolean m_isRunning = false;
+
+    // Receiver object for text messages.
     SmsReceiver smsReceiver = new SmsReceiver();
 
     @Nullable
@@ -41,15 +46,33 @@ public class TextService extends Service {
         String action = intent.getAction();
         if (Objects.equals(action, STOP)) {
             stopSelf();
+            m_isRunning = false;
+        } else {
+            m_isRunning = true;
         }
+
+        // Let activity know about status.
+        broadcastStatusChange();
 
         // Keep the service active after activity is closed.
         return START_STICKY;
     }
 
+    public static final String BROADCAST_ACTION = "TEXT_SERVICE_BROADCAST";
+
     @Override
     public void onDestroy() {
         unregisterReceiver(smsReceiver);
+        m_isRunning = false;
+        broadcastStatusChange();
+    }
+
+    // Broadcast to activity that status has been changed.
+    private void broadcastStatusChange() {
+        Intent intent = new Intent();
+        intent.setAction(BROADCAST_ACTION);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        sendBroadcast(intent);
     }
 
     // Class that receives text messages.
@@ -121,5 +144,10 @@ public class TextService extends Service {
         // notificationId is a unique int for each notification that you must define
         int notificationId = 1;
         notificationManager.notify(notificationId, builder.build());
+    }
+
+    // Check if service is running.
+    public static boolean isRunning() {
+        return m_isRunning;
     }
 }

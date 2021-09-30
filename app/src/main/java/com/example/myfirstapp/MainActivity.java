@@ -1,9 +1,14 @@
 package com.example.myfirstapp;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,6 +19,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityManagerCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
@@ -22,12 +28,26 @@ public class MainActivity extends AppCompatActivity {
 
     static final String CHANNEL_ID = "PING_CHANNEL";
     private static final int REQUEST_CODE = 1000;
+    private ResponseReceiver receiver;
+
+    // Receives messages from the service.
+    public class ResponseReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateStatusLabel();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         createNotificationChannel();
+
+        IntentFilter filter = new IntentFilter(TextService.BROADCAST_ACTION);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        receiver = new ResponseReceiver();
+        registerReceiver(receiver, filter);
     }
     
     private void createNotificationChannel() {
@@ -114,6 +134,11 @@ public class MainActivity extends AppCompatActivity {
     // Update the service status label.
     private void updateStatusLabel() {
         TextView view = findViewById(R.id.textViewStatus);
-        view.setText("Service is...");
+        if (TextService.isRunning()) {
+            view.setText(R.string.service_is_running_message);
+        }
+        else {
+            view.setText(R.string.service_is_stopped_message);
+        }
     }
 }
