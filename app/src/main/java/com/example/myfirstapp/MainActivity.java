@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         receiver = new ResponseReceiver();
         registerReceiver(receiver, filter);
+
+        updateStatusLabel();
     }
     
     private void createNotificationChannel() {

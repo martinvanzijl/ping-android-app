@@ -10,33 +10,36 @@
         android:id="@+id/textViewServiceStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:text="@string/status_label"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/buttonStartService"
-        app:layout_constraintStart_toStartOf="@+id/buttonStartService"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/buttonStartService"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/buttonStartService"
-        android:layout_width="wrap_content"
+        android:layout_width="409dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="67dp"
+        android:layout_marginBottom="8dp"
         android:onClick="onButtonStartServiceClick"
         android:text="@string/start_service_label"
         app:layout_constraintBottom_toTopOf="@+id/buttonStopService"
-        app:layout_constraintEnd_toEndOf="@+id/buttonStopService"
-        app:layout_constraintStart_toStartOf="@+id/buttonStopService" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/buttonStopService"
-        android:layout_width="wrap_content"
+        android:layout_width="409dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="146dp"
-        android:layout_marginBottom="103dp"
+        android:layout_marginBottom="16dp"
         android:onClick="onButtonStopServiceClick"
         android:text="@string/stop_service_label"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/buttonPing"
