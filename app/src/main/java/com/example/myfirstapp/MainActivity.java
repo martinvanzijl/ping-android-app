@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onButtonStartServiceClick(View view) {
         if (checkForPermission(Manifest.permission.READ_SMS) &&
+                checkForPermission(Manifest.permission.RECEIVE_SMS) &&
                 checkForPermission(Manifest.permission.SEND_SMS)) {
             startService(new Intent(this, TextService.class));
         }
