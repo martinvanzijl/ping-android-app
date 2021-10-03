@@ -96,7 +96,9 @@ public class TextService extends Service {
                     }
 
                     // Send a reply.
-                    sendText(number);
+                    if (body.toString().equals(MainActivity.PING_REQUEST_TEXT)) {
+                        sendText(number);
+                    }
                 }
             }
         }

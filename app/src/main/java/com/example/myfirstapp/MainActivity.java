@@ -27,6 +27,7 @@ import android.provider.ContactsContract.Contacts;
 public class MainActivity extends AppCompatActivity {
 
     static final String CHANNEL_ID = "PING_CHANNEL";
+    static final String PING_REQUEST_TEXT = "Sent from Ping App. Where are you?";
     private static final int REQUEST_CODE = 1000;
     private ResponseReceiver receiver;
 
@@ -212,8 +213,7 @@ public class MainActivity extends AppCompatActivity {
     private void sendPingRequest(String number) {
         try {
             SmsManager manager = SmsManager.getDefault();
-            String text ="Sent from Ping App. Where are you?";
-            manager.sendTextMessage(number, null, text, null, null);
+            manager.sendTextMessage(number, null, PING_REQUEST_TEXT, null, null);
             String labelMessage = getString(R.string.ping_request_sent_message, number);
             TextView view = findViewById(R.id.textViewPingStatus);
             view.setText(labelMessage);
