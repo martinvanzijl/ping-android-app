@@ -9,4 +9,7 @@
     <string name="status_label">Welcome to Ping.</string>
     <string name="service_is_running_message">Service is running.</string>
     <string name="service_is_stopped_message">Service is stopped.</string>
+    <string name="ping_button_label">Choose Phone to Ping</string>
+    <string name="ping_status_label_hint">Click the button above to ping another phone.</string>
+    <string name="ping_request_sent_message">Ping request sent to %1$s.</string>
 </resources>

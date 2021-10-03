@@ -1,17 +1,19 @@
 package com.example.myfirstapp;
 
 import android.Manifest;
-import android.app.ActivityManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.telephony.SmsManager;
 import android.view.View;
 import android.widget.TextView;
@@ -19,10 +21,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.ActivityManagerCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import android.provider.ContactsContract.Contacts;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -133,12 +133,90 @@ public class MainActivity extends AppCompatActivity {
 
     // Update the service status label.
     private void updateStatusLabel() {
-        TextView view = findViewById(R.id.textViewStatus);
+        TextView view = findViewById(R.id.textViewServiceStatus);
         if (TextService.isRunning()) {
             view.setText(R.string.service_is_running_message);
         }
         else {
             view.setText(R.string.service_is_stopped_message);
+        }
+    }
+
+    // Choose a phone to ping.
+    public void onPingButtonClick(View view) {
+        // Choose a contact.
+        if (checkForPermission(Manifest.permission.READ_CONTACTS)) {
+            Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
+                    Contacts.CONTENT_URI);
+            startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
+        }
+    }
+
+    private static final int CONTACT_PICKER_RESULT = 1001;
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case CONTACT_PICKER_RESULT:
+                    // Handle contact results.
+                    System.out.println("Contact picked.");
+                    pingPhone(data);
+                    break;
+                default:
+                    System.out.println("Unexpected activity result code: " + requestCode);
+            }
+
+        } else {
+            // Gracefully handle failure.
+            System.out.println("Warning: Activity result not OK.");
+        }
+    }
+
+    // Ping the phone from the given data.
+    private void pingPhone(Intent data) {
+        Uri uri = data.getData();
+        if (uri != null) {
+            Cursor cursor = null;
+            try {
+                Uri contentUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+                String id = uri.getLastPathSegment();
+                String selection = ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?";
+                String[] selectionArgs = new String[] {id};
+                cursor = getContentResolver().query(contentUri, null, selection, selectionArgs, null);
+
+                if (cursor != null && cursor.moveToFirst()) {
+                    String columnName = ContactsContract.CommonDataKinds.Phone.NUMBER;
+                    int columnIndex = cursor.getColumnIndex(columnName);
+                    String number = cursor.getString(columnIndex);
+                    System.out.println("Number is: " + number);
+                    sendPingRequest(number);
+                }
+            }
+            catch (SQLiteException | SecurityException | IllegalArgumentException e) {
+                System.out.println(e.getLocalizedMessage());
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        }
+    }
+
+    // Send a Ping request to the given number.
+    private void sendPingRequest(String number) {
+        try {
+            SmsManager manager = SmsManager.getDefault();
+            String text ="Sent from Ping App. Where are you?";
+            manager.sendTextMessage(number, null, text, null, null);
+            String labelMessage = getString(R.string.ping_request_sent_message, number);
+            TextView view = findViewById(R.id.textViewPingStatus);
+            view.setText(labelMessage);
+        }
+        catch (SecurityException e) {
+            System.out.println(e.getLocalizedMessage());
         }
     }
 }
