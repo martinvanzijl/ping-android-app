@@ -64,4 +64,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/buttonPing" />
 
+    <Button
+        android:id="@+id/buttonWhitelist"
+        android:layout_width="409dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:onClick="onWhitelistButtonClick"
+        android:text="@string/button_whitelist_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewPingStatus" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

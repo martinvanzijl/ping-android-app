@@ -222,4 +222,10 @@ public class MainActivity extends AppCompatActivity {
             System.out.println(e.getLocalizedMessage());
         }
     }
+
+    // Choose allowed contacts.
+    public void onWhitelistButtonClick(View view) {
+        Intent intent = new Intent(this, WhitelistActivity.class);
+        startActivity(intent);
+    }
 }

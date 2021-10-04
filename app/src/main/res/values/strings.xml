@@ -12,4 +12,7 @@
     <string name="ping_button_label">Choose Phone to Ping</string>
     <string name="ping_status_label_hint">Click the button above to ping another phone.</string>
     <string name="ping_request_sent_message">Ping request sent to %1$s.</string>
+    <string name="button_whitelist_label">Choose Who can Ping Me</string>
+    <string name="text_view_whitelist_text">The following phones can ping me:</string>
+    <string name="button_add_label">Choose a Number to Add</string>
 </resources>
