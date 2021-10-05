@@ -1,5 +1,6 @@
 package com.example.myfirstapp;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,9 @@ import java.util.List;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
     private List<String> data;
+    private int selectedPos = RecyclerView.NO_POSITION;
+    private View selectedView = null;
+
     public CustomAdapter (List<String> data){
         this.data = data;
     }
@@ -26,6 +30,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     @Override
     public void onBindViewHolder(CustomAdapter.ViewHolder holder, int position) {
         holder.textView.setText(this.data.get(position));
+        holder.itemView.setSelected(selectedPos == position);
     }
 
     @Override
@@ -33,7 +38,15 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         return this.data.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public boolean isItemSelected() {
+        return selectedPos != RecyclerView.NO_POSITION;
+    }
+
+    public String getSelectedText() {
+        return this.data.get(selectedPos);
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView textView;
 
         public ViewHolder(View view) {
@@ -45,6 +58,14 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         @Override
         public void onClick(View view) {
             System.out.println("position : " + getLayoutPosition() + " text : " + this.textView.getText());
+
+            if (selectedView != null) {
+                selectedView.setBackgroundColor(Color.WHITE);
+            }
+
+            selectedPos = getLayoutPosition();
+            view.setBackgroundColor(Color.CYAN);
+            selectedView = view;
         }
     }
 }

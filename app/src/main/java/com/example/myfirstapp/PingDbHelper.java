@@ -64,4 +64,18 @@ public class PingDbHelper extends SQLiteOpenHelper {
 
         return cursor;
     }
+
+    public void deleteWhitelistContact(String phoneNumber) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = getWritableDatabase();
+
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(PingDatabaseContract.WhitelistContactEntry.COLUMN_NAME_PHONE_NUMBER, phoneNumber);
+
+        // Insert the new row, returning the primary key value of the new row
+        String whereClause = PingDatabaseContract.WhitelistContactEntry.COLUMN_NAME_PHONE_NUMBER + "=?";
+        String[] args = new String[] {phoneNumber};
+        db.delete(PingDatabaseContract.WhitelistContactEntry.TABLE_NAME, whereClause, args);
+    }
 }

@@ -16,4 +16,5 @@
     <string name="text_view_whitelist_text">The following phones can ping me:</string>
     <string name="button_add_label">Choose a Number to Add</string>
     <string name="text_view_placeholder">555 1234</string>
+    <string name="button_delete_label">Remove Selected Entry</string>
 </resources>
