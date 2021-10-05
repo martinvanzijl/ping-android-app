@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.telephony.PhoneNumberUtils;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 
@@ -97,7 +98,13 @@ public class TextService extends Service {
 
                     // Send a reply.
                     if (body.toString().equals(MainActivity.PING_REQUEST_TEXT)) {
-                        sendText(number);
+                        if (checkIfAllowed(number)) {
+                            sendText(number);
+                            System.out.println("Ping reply sent to " + number);
+                        }
+                        else {
+                            System.out.println("Ping request from " + number + " ignored.");
+                        }
                     }
                 }
             }
@@ -115,6 +122,18 @@ public class TextService extends Service {
             }
 
             return smsMessage;
+        }
+    }
+
+    // Check if ping request is allowed from number.
+    private boolean checkIfAllowed(String number) {
+        PingDbHelper database = new PingDbHelper(this);
+        if (database.whitelistContactExists(number)) {
+            return true;
+        }
+        else {
+            // TODO: Ask whether to allow or not.
+            return false;
         }
     }
 

@@ -5,6 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.telephony.PhoneNumberUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PingDbHelper extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
@@ -82,4 +86,45 @@ public class PingDbHelper extends SQLiteOpenHelper {
         // Delete all rows
         db.delete(PingDatabaseContract.WhitelistContactEntry.TABLE_NAME, null, null);
     }
+
+    public boolean whitelistContactExists(String phoneNumberToCheck) {
+        Cursor cursor = getWhitelistContacts();
+        List<String> contacts = new ArrayList<>();
+        while(cursor.moveToNext()) {
+            String phoneNumber = cursor.getString(
+                    cursor.getColumnIndexOrThrow(PingDatabaseContract.WhitelistContactEntry.COLUMN_NAME_PHONE_NUMBER));
+            contacts.add(phoneNumber);
+        }
+        cursor.close();
+
+        for (String phoneNumber: contacts) {
+            if (PhoneNumberUtils.compare(phoneNumber, phoneNumberToCheck)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+//    public boolean whitelistContactExists(String phoneNumber) {
+//        SQLiteDatabase db = getReadableDatabase();
+//
+//        String whereClause = PingDatabaseContract.WhitelistContactEntry.COLUMN_NAME_PHONE_NUMBER + "=?";
+//        String[] args = new String[] {phoneNumber};
+//
+//        Cursor cursor = db.query(
+//                PingDatabaseContract.WhitelistContactEntry.TABLE_NAME,
+//                null,
+//                whereClause,
+//                args,
+//                null,
+//                null,
+//                null
+//        );
+//
+//        int rows = cursor.getCount();
+//        cursor.close();
+//
+//        return (rows > 0);
+//    }
 }
