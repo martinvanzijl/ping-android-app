@@ -180,4 +180,8 @@ public class WhitelistActivity extends AppCompatActivity {
         // Update list view.
         updateListView();
     }
+
+    public void onButtonMainScreenClick(View view) {
+        finish();
+    }
 }

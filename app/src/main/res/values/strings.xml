@@ -18,4 +18,5 @@
     <string name="text_view_placeholder">555 1234</string>
     <string name="button_delete_label">Remove Selected Entry</string>
     <string name="button_clear_label">Remove All Entries</string>
+    <string name="button_main_screen_label">Back to Main Screen</string>
 </resources>
