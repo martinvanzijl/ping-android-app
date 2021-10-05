@@ -67,9 +67,6 @@ public class WhitelistActivity extends AppCompatActivity {
     }
 
     public void onButtonAddClick(View view) {
-        // Add to database.
-        PingDbHelper helper = new PingDbHelper(this);
-
         // Choose a contact.
         if (checkForPermission(Manifest.permission.READ_CONTACTS)) {
             Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
@@ -170,6 +167,15 @@ public class WhitelistActivity extends AppCompatActivity {
         // Update database.
         PingDbHelper database = new PingDbHelper(this);
         database.addWhitelistContact(phoneNumber);
+
+        // Update list view.
+        updateListView();
+    }
+
+    public void onButtonClearClick(View view) {
+        // Update database.
+        PingDbHelper database = new PingDbHelper(this);
+        database.deleteAllWhitelistContacts();
 
         // Update list view.
         updateListView();
