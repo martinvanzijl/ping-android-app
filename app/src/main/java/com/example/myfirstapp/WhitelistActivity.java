@@ -8,7 +8,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
@@ -28,8 +30,22 @@ public class WhitelistActivity extends AppCompatActivity {
 
         RecyclerView view = findViewById(R.id.recyclerViewMain);
         view.setLayoutManager(new LinearLayoutManager(this));
-        view.setAdapter(new CustomAdapter(generateData()));
+        //view.setAdapter(new CustomAdapter(generateData()));
+        view.setAdapter(new CustomAdapter(readFromDatabase()));
         view.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+    }
+
+    private List<String> readFromDatabase() {
+        PingDbHelper database = new PingDbHelper(this);
+        Cursor cursor = database.getWhitelistContacts();
+        List<String> contacts = new ArrayList<>();
+        while(cursor.moveToNext()) {
+            String phoneNumber = cursor.getString(
+                    cursor.getColumnIndexOrThrow(PingDatabaseContract.WhitelistContactEntry.COLUMN_NAME_PHONE_NUMBER));
+            contacts.add(phoneNumber);
+        }
+        cursor.close();
+        return contacts;
     }
 
     private List<String> generateData() {
@@ -39,4 +55,16 @@ public class WhitelistActivity extends AppCompatActivity {
         }
         return data;
     }
+
+    public void onButtonAddClick(View view) {
+        // Add to database.
+        PingDbHelper helper = new PingDbHelper(this);
+        helper.addWhitelistContact("555 1234");
+
+        // Update list view.
+        RecyclerView listView = findViewById(R.id.recyclerViewMain);
+        listView.setAdapter(new CustomAdapter(readFromDatabase()));
+    }
+
+
 }
