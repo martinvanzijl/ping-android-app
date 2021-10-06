@@ -1,21 +1,29 @@
 package com.example.myfirstapp;
 
-import android.app.AlertDialog;
+import android.Manifest;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.telephony.PhoneNumberUtils;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.Objects;
 
@@ -102,10 +110,9 @@ public class TextService extends Service {
                     // Send a reply.
                     if (body.toString().equals(MainActivity.PING_REQUEST_TEXT)) {
                         if (checkIfAllowed(number)) {
-                            sendText(number);
+                            sendPingReply(number);
                             System.out.println("Ping reply sent to " + number);
-                        }
-                        else {
+                        } else {
                             System.out.println("Ping request from " + number + " ignored.");
                         }
                     }
@@ -133,8 +140,7 @@ public class TextService extends Service {
         PingDbHelper database = new PingDbHelper(this);
         if (database.whitelistContactExists(number)) {
             return true;
-        }
-        else {
+        } else {
             askWhetherToAllow(number);
             return false;
         }
@@ -150,16 +156,52 @@ public class TextService extends Service {
         return false;
     }
 
-    // Send a reply.
-    private void sendText(String number) {
+    // Send a text message.
+    private void sendText(String number, String text) {
         try {
             SmsManager manager = SmsManager.getDefault();
-            String text = "Ping reply.";
             manager.sendTextMessage(number, null, text, null, null);
-        }
-        catch (SecurityException e) {
+        } catch (SecurityException e) {
             System.out.println(e.getLocalizedMessage());
         }
+    }
+
+    // Send a ping reply to the given number.
+    private void sendPingReply(String phoneNumber) {
+        FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            System.out.println("No permission for getting location information.");
+            return;
+        }
+
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // GPS location can be null if GPS is switched off
+                        if (location != null) {
+                            onAddressLocated(phoneNumber, location);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        System.out.println("Error trying to get last GPS location");
+                        e.printStackTrace();
+                    }
+                });
+    }
+
+    // Callback for when address is located for the ping reply.
+    private void onAddressLocated(String phoneNumber, Location location) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Ping reply.");
+        builder.append("\nLatitude: ").append(location.getLatitude());
+        builder.append("\nLongitude: ").append(location.getLongitude());
+        String message = builder.toString();
+        sendText(phoneNumber, message);
     }
 
     /**

@@ -137,7 +137,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onButtonStartServiceClick(View view) {
         if (checkForPermission(Manifest.permission.READ_SMS) &&
                 checkForPermission(Manifest.permission.RECEIVE_SMS) &&
-                checkForPermission(Manifest.permission.SEND_SMS)) {
+                checkForPermission(Manifest.permission.SEND_SMS) &&
+                checkForPermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
+                checkForPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
             startService(new Intent(this, TextService.class));
         }
     }
