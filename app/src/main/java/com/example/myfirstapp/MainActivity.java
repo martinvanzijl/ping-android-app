@@ -26,12 +26,25 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.provider.ContactsContract.Contacts;
 
-public class MainActivity extends AppCompatActivity {
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     static final String CHANNEL_ID = "PING_CHANNEL";
     static final String PING_REQUEST_TEXT = "Sent from Ping App. Where are you?";
     private static final int REQUEST_CODE = 1000;
     private ResponseReceiver receiver;
+    private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
+
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+    }
 
     // Receives messages from the service.
     public class ResponseReceiver extends BroadcastReceiver {
@@ -88,6 +101,21 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(receiver, filter);
 
         updateStatusLabel();
+
+        // Get a handle to the fragment and register the callback.
+        try {
+            Bundle mapViewBundle = null;
+            if (savedInstanceState != null) {
+                mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
+            }
+            MapView mMapView = (MapView) findViewById(R.id.mapViewMain);
+            mMapView.onCreate(mapViewBundle);
+
+            mMapView.getMapAsync(this);
+        }
+        catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+        }
     }
     
     private void createNotificationChannel() {
