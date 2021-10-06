@@ -26,6 +26,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.provider.ContactsContract.Contacts;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -40,10 +41,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int REQUEST_CODE = 1000;
     private ResponseReceiver receiver;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
+    private GoogleMap mMap;
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        mMap = googleMap;
+
+        // Add a marker in Sydney and move the camera
+        LatLng sydney = new LatLng(-34, 151);
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     // Receives messages from the service.
@@ -103,19 +110,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         updateStatusLabel();
 
         // Get a handle to the fragment and register the callback.
-        try {
-            Bundle mapViewBundle = null;
-            if (savedInstanceState != null) {
-                mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
-            }
-            MapView mMapView = (MapView) findViewById(R.id.mapViewMain);
-            mMapView.onCreate(mapViewBundle);
-
-            mMapView.getMapAsync(this);
-        }
-        catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
-        }
+//        try {
+//            Bundle mapViewBundle = null;
+//            if (savedInstanceState != null) {
+//                mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
+//            }
+//            MapView mMapView = (MapView) findViewById(R.id.mapViewMain);
+//            //mMapView.onCreate(mapViewBundle);
+//
+//            mMapView.getMapAsync(this);
+//        }
+//        catch (Exception e) {
+//            System.out.println(e.getLocalizedMessage());
+//        }
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+        mapFragment.onResume();
     }
     
     private void createNotificationChannel() {
