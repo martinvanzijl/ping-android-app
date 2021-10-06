@@ -35,6 +35,9 @@ public class TextService extends Service {
     // Command to stop the service.
     public static final String STOP = "STOP";
     public static final String ASK_WHETHER_TO_ALLOW = "ASK_WHETHER_TO_ALLOW";
+    public static final String PING_RESPONSE_ACTION = "PING_RESPONSE";
+    public static final String PING_RESPONSE_LATITUDE = "PING_RESPONSE_LATITUDE";
+    public static final String PING_RESPONSE_LONGITUDE = "PING_RESPONSE_LONGITUDE";
 
     // Hack to let activity know about status.
     private static boolean m_isRunning = false;
@@ -108,13 +111,17 @@ public class TextService extends Service {
                     }
 
                     // Send a reply.
-                    if (body.toString().equals(MainActivity.PING_REQUEST_TEXT)) {
+                    String text = body.toString();
+                    if (text.equals(MainActivity.PING_REQUEST_TEXT)) {
                         if (checkIfAllowed(number)) {
                             sendPingReply(number);
                             System.out.println("Ping reply sent to " + number);
                         } else {
                             System.out.println("Ping request from " + number + " ignored.");
                         }
+                    }
+                    else if(text.startsWith(MainActivity.PING_REPLY_START)){
+                        processPingResponse(text);
                     }
                 }
             }
@@ -133,6 +140,31 @@ public class TextService extends Service {
 
             return smsMessage;
         }
+    }
+
+    private void processPingResponse(String text) {
+        double latitude = 0;
+        double longitude = 0;
+        String[] lines = text.split("\n");
+        for (String line: lines) {
+            if (line.startsWith("Latitude: ")) {
+                String numberString = line.replace("Latitude: ", "");
+                latitude = Double.parseDouble(numberString);
+            }
+            else if (line.startsWith("Longitude: ")) {
+                String numberString = line.replace("Longitude: ", "");
+                longitude = Double.parseDouble(numberString);
+            }
+        }
+        System.out.println("Broadcasting ping response.");
+
+        Intent intent = new Intent();
+        intent.setAction(PING_RESPONSE_ACTION);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        //intent.putExtra(Intent.EXTRA_TEXT, new LocationData(latitude, longitude));
+        intent.putExtra(PING_RESPONSE_LATITUDE, latitude);
+        intent.putExtra(PING_RESPONSE_LONGITUDE, longitude);
+        sendBroadcast(intent);
     }
 
     // Check if ping request is allowed from number.
@@ -197,7 +229,7 @@ public class TextService extends Service {
     // Callback for when address is located for the ping reply.
     private void onAddressLocated(String phoneNumber, Location location) {
         StringBuilder builder = new StringBuilder();
-        builder.append("Ping reply.");
+        builder.append(MainActivity.PING_REPLY_START);
         builder.append("\nLatitude: ").append(location.getLatitude());
         builder.append("\nLongitude: ").append(location.getLongitude());
         String message = builder.toString();

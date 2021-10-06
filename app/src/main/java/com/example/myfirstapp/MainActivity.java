@@ -28,20 +28,22 @@ import android.provider.ContactsContract.Contacts;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    public static final String PING_REPLY_START = "Ping reply.";
     static final String CHANNEL_ID = "PING_CHANNEL";
     static final String PING_REQUEST_TEXT = "Sent from Ping App. Where are you?";
     private static final int REQUEST_CODE = 1000;
     private ResponseReceiver receiver;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private GoogleMap mMap;
+    private Marker mMarker;
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -49,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        mMarker = mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
@@ -65,7 +67,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 String phoneNumber = intent.getStringExtra(Intent.EXTRA_TEXT);
                 askWhetherToAllow(phoneNumber);
             }
+            else if (intent.getAction() == TextService.PING_RESPONSE_ACTION) {
+                double latitude = intent.getDoubleExtra(TextService.PING_RESPONSE_LATITUDE, 0);
+                double longitude = intent.getDoubleExtra(TextService.PING_RESPONSE_LONGITUDE, 0);
+                placeMapMarker(latitude, longitude);
+            }
         }
+    }
+
+    private void placeMapMarker(double latitude, double longitude) {
+        // Add a marker and move the camera
+        LatLng position = new LatLng(latitude, longitude);
+        mMarker.remove();
+        mMarker = mMap.addMarker(new MarkerOptions().position(position).title("Pinged Phone"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
     }
 
     private void askWhetherToAllow(String phoneNumber) {
@@ -103,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         IntentFilter filter = new IntentFilter(TextService.BROADCAST_ACTION);
         filter.addAction(TextService.ASK_WHETHER_TO_ALLOW);
+        filter.addAction(TextService.PING_RESPONSE_ACTION);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         receiver = new ResponseReceiver();
         registerReceiver(receiver, filter);
