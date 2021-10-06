@@ -1,10 +1,12 @@
 package com.example.myfirstapp;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -35,8 +37,42 @@ public class MainActivity extends AppCompatActivity {
     public class ResponseReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            updateStatusLabel();
+            System.out.println("Received broadcast.");
+            if (intent.getAction() == TextService.BROADCAST_ACTION) {
+                updateStatusLabel();
+            }
+            else if(intent.getAction() == TextService.ASK_WHETHER_TO_ALLOW) {
+                String phoneNumber = intent.getStringExtra(Intent.EXTRA_TEXT);
+                askWhetherToAllow(phoneNumber);
+            }
         }
+    }
+
+    private void askWhetherToAllow(String phoneNumber) {
+        System.out.println("Asking whether to allow " + phoneNumber);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirm");
+        builder.setMessage("Allow ping request from " + phoneNumber + "?");
+
+        // Add the buttons
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked OK button
+                PingDbHelper database = new PingDbHelper(getApplicationContext());
+                database.addWhitelistContact(phoneNumber);
+                System.out.println("Added " + phoneNumber + " to whitelist.");
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+            }
+        });
+
+        // Create the AlertDialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     @Override
@@ -46,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
         createNotificationChannel();
 
         IntentFilter filter = new IntentFilter(TextService.BROADCAST_ACTION);
+        filter.addAction(TextService.ASK_WHETHER_TO_ALLOW);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         receiver = new ResponseReceiver();
         registerReceiver(receiver, filter);

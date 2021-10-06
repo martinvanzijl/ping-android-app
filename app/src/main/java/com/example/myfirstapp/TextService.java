@@ -1,5 +1,6 @@
 package com.example.myfirstapp;
 
+import android.app.AlertDialog;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -25,9 +26,11 @@ public class TextService extends Service {
 
     // Command to stop the service.
     public static final String STOP = "STOP";
+    public static final String ASK_WHETHER_TO_ALLOW = "ASK_WHETHER_TO_ALLOW";
 
     // Hack to let activity know about status.
     private static boolean m_isRunning = false;
+    private static String m_numberToAskAbout = "555 1234";
 
     // Receiver object for text messages.
     SmsReceiver smsReceiver = new SmsReceiver();
@@ -132,9 +135,19 @@ public class TextService extends Service {
             return true;
         }
         else {
-            // TODO: Ask whether to allow or not.
+            askWhetherToAllow(number);
             return false;
         }
+    }
+
+    private boolean askWhetherToAllow(String number) {
+        System.out.println("Service is asking whether to allow " + number);
+        Intent intent = new Intent();
+        intent.setAction(ASK_WHETHER_TO_ALLOW);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        intent.putExtra(Intent.EXTRA_TEXT, number);
+        sendBroadcast(intent);
+        return false;
     }
 
     // Send a reply.
