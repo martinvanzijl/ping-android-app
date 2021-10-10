@@ -38,6 +38,7 @@ public class TextService extends Service {
     public static final String PING_RESPONSE_ACTION = "PING_RESPONSE";
     public static final String PING_RESPONSE_LATITUDE = "PING_RESPONSE_LATITUDE";
     public static final String PING_RESPONSE_LONGITUDE = "PING_RESPONSE_LONGITUDE";
+    public static final String PING_RESPONSE_CONTACT_NAME = "PING_RESPONSE_CONTACT_NAME";
 
     // Hack to let activity know about status.
     private static boolean m_isRunning = false;
@@ -121,7 +122,7 @@ public class TextService extends Service {
                         }
                     }
                     else if(text.startsWith(MainActivity.PING_REPLY_START)){
-                        processPingResponse(text);
+                        processPingResponse(text, number);
                     }
                 }
             }
@@ -142,7 +143,7 @@ public class TextService extends Service {
         }
     }
 
-    private void processPingResponse(String text) {
+    private void processPingResponse(String text, String phoneNumber) {
         double latitude = 0;
         double longitude = 0;
         String[] lines = text.split("\n");
@@ -164,6 +165,7 @@ public class TextService extends Service {
         //intent.putExtra(Intent.EXTRA_TEXT, new LocationData(latitude, longitude));
         intent.putExtra(PING_RESPONSE_LATITUDE, latitude);
         intent.putExtra(PING_RESPONSE_LONGITUDE, longitude);
+        intent.putExtra(PING_RESPONSE_CONTACT_NAME, phoneNumber);
         sendBroadcast(intent);
     }
 
@@ -211,6 +213,8 @@ public class TextService extends Service {
                 .addOnSuccessListener(new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
+                        System.out.println("Location gotten");
+
                         // GPS location can be null if GPS is switched off
                         if (location != null) {
                             onAddressLocated(phoneNumber, location);
@@ -228,6 +232,8 @@ public class TextService extends Service {
 
     // Callback for when address is located for the ping reply.
     private void onAddressLocated(String phoneNumber, Location location) {
+        System.out.println("Sending text with location.");
+
         StringBuilder builder = new StringBuilder();
         builder.append(MainActivity.PING_REPLY_START);
         builder.append("\nLatitude: ").append(location.getLatitude());

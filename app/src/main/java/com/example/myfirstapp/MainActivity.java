@@ -34,6 +34,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     public static final String PING_REPLY_START = "Ping reply.";
@@ -43,16 +46,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ResponseReceiver receiver;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private GoogleMap mMap;
-    private Marker mMarker;
+//    private Marker mMarker;
+    private Map<String, Marker> mMarkers = new HashMap<>();
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMarker = mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+//        LatLng sydney = new LatLng(-34, 151);
+//        mMarker = mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     // Receives messages from the service.
@@ -70,16 +74,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             else if (intent.getAction() == TextService.PING_RESPONSE_ACTION) {
                 double latitude = intent.getDoubleExtra(TextService.PING_RESPONSE_LATITUDE, 0);
                 double longitude = intent.getDoubleExtra(TextService.PING_RESPONSE_LONGITUDE, 0);
-                placeMapMarker(latitude, longitude);
+                String text = intent.getStringExtra(TextService.PING_RESPONSE_CONTACT_NAME);
+                placeMapMarker(text, latitude, longitude);
             }
         }
     }
 
-    private void placeMapMarker(double latitude, double longitude) {
+    private void placeMapMarker(String text, double latitude, double longitude) {
         // Add a marker and move the camera
         LatLng position = new LatLng(latitude, longitude);
-        mMarker.remove();
-        mMarker = mMap.addMarker(new MarkerOptions().position(position).title("Pinged Phone"));
+
+//        mMarker.remove();
+//        mMarker = mMap.addMarker(new MarkerOptions().position(position).title("Pinged Phone"));
+
+        // Place or update the marker.
+        if (mMarkers.containsKey(text)) {
+            Marker marker = mMarkers.get(text);
+            marker.setPosition(position);
+        }
+        else {
+            Marker marker = mMap.addMarker(new MarkerOptions().position(position).title(text));
+            mMarkers.put(text, marker);
+        }
+
+        // Go to the placed marker.
         mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
     }
 
@@ -125,24 +143,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         updateStatusLabel();
 
-        // Get a handle to the fragment and register the callback.
-//        try {
-//            Bundle mapViewBundle = null;
-//            if (savedInstanceState != null) {
-//                mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
-//            }
-//            MapView mMapView = (MapView) findViewById(R.id.mapViewMain);
-//            //mMapView.onCreate(mapViewBundle);
-//
-//            mMapView.getMapAsync(this);
-//        }
-//        catch (Exception e) {
-//            System.out.println(e.getLocalizedMessage());
-//        }
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        //mapFragment.onResume();
     }
     
     private void createNotificationChannel() {
@@ -166,7 +169,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 checkForPermission(Manifest.permission.RECEIVE_SMS) &&
                 checkForPermission(Manifest.permission.SEND_SMS) &&
                 checkForPermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
-                checkForPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                checkForPermission(Manifest.permission.ACCESS_COARSE_LOCATION) &&
+//                checkForPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) &&
+                checkForPermission(Manifest.permission.FOREGROUND_SERVICE)) {
             startService(new Intent(this, TextService.class));
         }
     }
