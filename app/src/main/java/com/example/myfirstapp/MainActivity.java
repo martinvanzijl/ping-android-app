@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.Contacts;
 import android.telephony.SmsManager;
 import android.view.View;
 import android.widget.TextView;
@@ -24,7 +25,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import android.provider.ContactsContract.Contacts;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -44,10 +44,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     static final String PING_REQUEST_TEXT = "Sent from Ping App. Where are you?";
     private static final int REQUEST_CODE = 1000;
     private ResponseReceiver receiver;
-    private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
     private GoogleMap mMap;
 //    private Marker mMarker;
-    private Map<String, Marker> mMarkers = new HashMap<>();
+    private final Map<String, Marker> mMarkers = new HashMap<>();
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -74,13 +73,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             else if (intent.getAction() == TextService.PING_RESPONSE_ACTION) {
                 double latitude = intent.getDoubleExtra(TextService.PING_RESPONSE_LATITUDE, 0);
                 double longitude = intent.getDoubleExtra(TextService.PING_RESPONSE_LONGITUDE, 0);
-                String text = intent.getStringExtra(TextService.PING_RESPONSE_CONTACT_NAME);
-                placeMapMarker(text, latitude, longitude);
+                String phoneNumber = intent.getStringExtra(TextService.PING_RESPONSE_CONTACT_NAME);
+                placeMapMarker(phoneNumber, latitude, longitude);
             }
         }
     }
 
-    private void placeMapMarker(String text, double latitude, double longitude) {
+    private void placeMapMarker(String phoneNumber, double latitude, double longitude) {
         // Add a marker and move the camera
         LatLng position = new LatLng(latitude, longitude);
 
@@ -88,13 +87,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        mMarker = mMap.addMarker(new MarkerOptions().position(position).title("Pinged Phone"));
 
         // Place or update the marker.
-        if (mMarkers.containsKey(text)) {
-            Marker marker = mMarkers.get(text);
+        if (mMarkers.containsKey(phoneNumber)) {
+            Marker marker = mMarkers.get(phoneNumber);
             marker.setPosition(position);
         }
         else {
-            Marker marker = mMap.addMarker(new MarkerOptions().position(position).title(text));
-            mMarkers.put(text, marker);
+            String markerText = phoneNumber;
+            String contactName = getContactName(phoneNumber, this);
+            if (contactName != null && !contactName.isEmpty()) {
+                markerText = contactName;
+            }
+            Marker marker = mMap.addMarker(new MarkerOptions().position(position).title(markerText));
+            mMarkers.put(phoneNumber, marker);
         }
 
         // Go to the placed marker.
@@ -327,5 +331,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onWhitelistButtonClick(View view) {
         Intent intent = new Intent(this, WhitelistActivity.class);
         startActivity(intent);
+    }
+
+    // Look up contact name from phone number.
+    // From:
+    // https://stackoverflow.com/questions/3079365/android-retrieve-contact-name-from-phone-number
+    public String getContactName(final String phoneNumber, Context context)
+    {
+        Uri uri=Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,Uri.encode(phoneNumber));
+
+        String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME};
+
+        String contactName="";
+        Cursor cursor=context.getContentResolver().query(uri,projection,null,null,null);
+
+        if (cursor != null) {
+            if(cursor.moveToFirst()) {
+                contactName=cursor.getString(0);
+            }
+            cursor.close();
+        }
+
+        return contactName;
     }
 }
