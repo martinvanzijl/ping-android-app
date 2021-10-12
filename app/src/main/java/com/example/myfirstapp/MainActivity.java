@@ -133,6 +133,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         dialog.show();
     }
 
+    // Show an alert message.
+    private void showMessageDialog(String message) {
+        // Set up the dialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Message from Ping");
+        builder.setMessage(message);
+        builder.setNeutralButton("OK", null);
+
+        // Create the dialog.
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -178,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
 //                Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                Manifest.permission.FOREGROUND_SERVICE
+//                Manifest.permission.FOREGROUND_SERVICE
         };
 
         // Start the service if these are granted.
@@ -212,13 +225,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         else if (requestCode == REQUEST_CODE_START_SERVICE) {
             // Check if all results were granted.
             boolean okToStart = true;
+            String missingPermission = "";
 
             if (grantResults.length == 0) {
                 okToStart = false;
             }
             else {
-                for (int result : grantResults) {
-                    if (result != PackageManager.PERMISSION_GRANTED) {
+                for (int i = 0; i < grantResults.length; ++i) {
+                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                        missingPermission = permissions[i];
                         okToStart = false;
                         break;
                     }
@@ -230,7 +245,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 startService(new Intent(this, TextService.class));
             }
             else {
-                System.out.println("Could not start service, since not all permissions were granted.");
+                String message = "Could not start service, since not all permissions were granted.";
+                message += "\nMissing: " + missingPermission;
+                showMessageDialog(message);
             }
         }
     }
