@@ -42,7 +42,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static final String PING_REPLY_START = "Ping reply.";
     static final String CHANNEL_ID = "PING_CHANNEL";
     static final String PING_REQUEST_TEXT = "Sent from Ping App. Where are you?";
-    private static final int REQUEST_CODE = 1000;
+    private static final int REQUEST_CODE_PICK_CONTACT = 1000;
+    private static final int REQUEST_CODE_START_SERVICE = 1001;
     private ResponseReceiver receiver;
     private GoogleMap mMap;
 //    private Marker mMarker;
@@ -169,13 +170,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void onButtonStartServiceClick(View view) {
-        if (checkForPermission(Manifest.permission.READ_SMS) &&
-                checkForPermission(Manifest.permission.RECEIVE_SMS) &&
-                checkForPermission(Manifest.permission.SEND_SMS) &&
-                checkForPermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
-                checkForPermission(Manifest.permission.ACCESS_COARSE_LOCATION) &&
-//                checkForPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) &&
-                checkForPermission(Manifest.permission.FOREGROUND_SERVICE)) {
+        // Check for required permissions.
+        String[] requiredPermissions = new String[] {
+                Manifest.permission.READ_SMS,
+                Manifest.permission.RECEIVE_SMS,
+                Manifest.permission.SEND_SMS,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+//                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                Manifest.permission.FOREGROUND_SERVICE
+        };
+
+        // Start the service if these are granted.
+        if (checkForPermissions(requiredPermissions, REQUEST_CODE_START_SERVICE)) {
             startService(new Intent(this, TextService.class));
         }
     }
@@ -191,26 +198,77 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE) {// If request is cancelled, the result arrays are empty.
+        if (requestCode == REQUEST_CODE_PICK_CONTACT) {
+            // If request is cancelled, the result arrays are empty.
             if (grantResults.length > 0 &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission is granted. Continue the action or workflow
                 // in your app.
-                System.out.println("Permission was granted.");
+                chooseContactToPing();
             } else {
-                // Explain to the user that the feature is unavailable because
-                // the features requires a permission that the user has denied.
-                // At the same time, respect the user's decision. Don't link to
-                // system settings in an effort to convince the user to change
-                // their decision.
-                System.out.println("Without this permission, Ping does not work.");
+                System.out.println("Ping must be able to read contacts to work.");
             }
         }
-        // Other 'case' lines to check for other
-        // permissions this app might request.
+        else if (requestCode == REQUEST_CODE_START_SERVICE) {
+            // Check if all results were granted.
+            boolean okToStart = true;
+
+            if (grantResults.length == 0) {
+                okToStart = false;
+            }
+            else {
+                for (int result : grantResults) {
+                    if (result != PackageManager.PERMISSION_GRANTED) {
+                        okToStart = false;
+                        break;
+                    }
+                }
+            }
+
+            // Start service if all granted.
+            if (okToStart) {
+                startService(new Intent(this, TextService.class));
+            }
+            else {
+                System.out.println("Could not start service, since not all permissions were granted.");
+            }
+        }
     }
 
-    private boolean checkForPermission(String permission) {
+    // Return true if the app has the given permission.
+    private boolean hasPermission(String permission) {
+        return ContextCompat.checkSelfPermission(
+                getApplicationContext(), permission) ==
+                PackageManager.PERMISSION_GRANTED;
+    }
+
+    // Check that the required permissions are granted.
+    // If not, ask for permission with the given request code.
+    private boolean checkForPermissions(String[] permissions, int requestCode) {
+
+        boolean mustAsk = false;
+        for (String permission : permissions) {
+            if (!hasPermission(permission)) {
+                mustAsk = true;
+                break;
+            }
+        }
+
+        if (!mustAsk) {
+            return true;
+        }
+
+        if (shouldShowRequestPermissionRationale()) {
+            System.out.println("Ping must read your location and reply to texts to work.");
+        } else {
+            ActivityCompat.requestPermissions(this, permissions, requestCode);
+        }
+
+        return false;
+    }
+
+    // Check if a single permission is granted.
+    private boolean checkForPermission(String permission, int requestCode) {
         if (ContextCompat.checkSelfPermission(
                 getApplicationContext(), permission) ==
                 PackageManager.PERMISSION_GRANTED) {
@@ -229,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             // You can directly ask for the permission.
             ActivityCompat.requestPermissions(this,
                     new String[] { permission },
-                    REQUEST_CODE);
+                    requestCode);
         }
         return false;
     }
@@ -251,12 +309,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     // Choose a phone to ping.
+    private void chooseContactToPing() {
+        Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
+                Contacts.CONTENT_URI);
+        startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
+    }
+
     public void onPingButtonClick(View view) {
-        // Choose a contact.
-        if (checkForPermission(Manifest.permission.READ_CONTACTS)) {
-            Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
-                    Contacts.CONTENT_URI);
-            startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
+        // Check for permissions first.
+        if (checkForPermission(Manifest.permission.READ_CONTACTS, REQUEST_CODE_PICK_CONTACT)) {
+            chooseContactToPing();
         }
     }
 
