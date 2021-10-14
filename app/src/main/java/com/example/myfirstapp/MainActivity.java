@@ -2,6 +2,7 @@ package com.example.myfirstapp;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -24,6 +25,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -34,6 +37,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,9 +68,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public class ResponseReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            System.out.println("Received broadcast.");
+//            System.out.println("Received broadcast.");
             if (intent.getAction() == TextService.BROADCAST_ACTION) {
                 updateStatusLabel();
+                notifyIfServiceStopped();
             }
             else if(intent.getAction() == TextService.ASK_WHETHER_TO_ALLOW) {
                 String phoneNumber = intent.getStringExtra(Intent.EXTRA_TEXT);
@@ -80,6 +86,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    // Notify if the service has stopped.
+    private void notifyIfServiceStopped() {
+        if (!TextService.isRunning()) {
+            Date date = new Date();
+            //SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String message = "Service stopped at " + format.format(date) + ".";
+            giveNotification(message);
+        }
+    }
+
+    // Update the map marker for the given number.
     private void placeMapMarker(String phoneNumber, double latitude, double longitude) {
         // Add a marker and move the camera
         LatLng position = new LatLng(latitude, longitude);
@@ -106,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
     }
 
+    // Ask whether to allow a ping request.
     private void askWhetherToAllow(String phoneNumber) {
         System.out.println("Asking whether to allow " + phoneNumber);
 
@@ -165,7 +184,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
-    
+
+    // Create the channel for notifications.
     private void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
@@ -323,6 +343,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         else {
             view.setText(R.string.service_is_stopped_message);
         }
+    }
+
+    // Give a notification.
+    private void giveNotification(String message) {
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.message_icon)
+                .setContentTitle("Message from Ping")
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setChannelId(CHANNEL_ID);
+
+        // notificationId is a unique int for each notification that you must define
+        int notificationId = 1;
+        Notification notification = builder.build();
+        notificationManager.notify(notificationId, notification);
     }
 
     // Choose a phone to ping.
