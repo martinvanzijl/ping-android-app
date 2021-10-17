@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationRequest;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -22,8 +23,10 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.CancellationToken;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnTokenCanceledListener;
 
 import java.util.Objects;
 
@@ -202,18 +205,58 @@ public class TextService extends Service {
 
     // Send a ping reply to the given number.
     private void sendPingReply(String phoneNumber) {
+        // Get the location provider.
         FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        // Check that the right permissions have been granted.
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             System.out.println("No permission for getting location information.");
             return;
         }
 
+        // Try getting the current location.
+        mFusedLocationClient.getCurrentLocation(LocationRequest.QUALITY_HIGH_ACCURACY, null)
+                .addOnSuccessListener(new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        System.out.println("Current location gotten");
+
+                        // GPS location can be null if GPS is switched off
+                        // or not gotten in reasonable time.
+                        if (location != null) {
+                            onAddressLocated(phoneNumber, location);
+                        }
+                        else {
+                            replyWithLastLocation(phoneNumber);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        System.out.println("Error trying to get current GPS location");
+                        replyWithLastLocation(phoneNumber);
+                    }
+                });
+    }
+
+    // Reply with the last (previous known) location.
+    private void replyWithLastLocation(String phoneNumber) {
+        // Get the location provider.
+        FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // Check that the right permissions have been granted.
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            System.out.println("No permission for getting location information.");
+            return;
+        }
+
+        // Get the last (previous known) location.
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
-                        System.out.println("Location gotten");
+                        System.out.println("Last location gotten");
 
                         // GPS location can be null if GPS is switched off
                         if (location != null) {
@@ -225,7 +268,6 @@ public class TextService extends Service {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         System.out.println("Error trying to get last GPS location");
-                        e.printStackTrace();
                     }
                 });
     }
