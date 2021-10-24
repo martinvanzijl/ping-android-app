@@ -17,6 +17,7 @@ import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
 import android.telephony.SmsManager;
@@ -39,9 +40,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -201,7 +204,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
 
         // This causes an exception.
-        Logger.getLogger("MainActivity").info("Started app.");
+        //Logger.getLogger("MainActivity").info("Started app.");
+        appendLog("Hello");
     }
 
     // Create the channel for notifications.
@@ -488,5 +492,39 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         return contactName;
+    }
+
+    // Test writing to a file.
+    public void appendLog(String text)
+    {
+        File dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+        String fileName = dir + "/log.txt";
+        File logFile = new File(fileName);
+        Log.i("Log File Name", logFile.getAbsolutePath());
+        if (!logFile.exists())
+        {
+            try
+            {
+                logFile.createNewFile();
+            }
+            catch (IOException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        try
+        {
+            //BufferedWriter for performance, true to set append to file flag
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+            buf.append(text);
+            buf.newLine();
+            buf.close();
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }
