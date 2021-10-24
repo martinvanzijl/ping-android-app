@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
 //    private Marker mMarker;
     private final Map<String, Marker> mMarkers = new HashMap<>();
+    private boolean m_dialogIsRunning = false;
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -126,6 +127,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // Ask whether to allow a ping request.
     private void askWhetherToAllow(String phoneNumber) {
+
+        // Avoid showing more than one dialog at a time.
+        if (m_dialogIsRunning) {
+            System.out.println("Ignoring request from " + phoneNumber + " since dialog is alraedy running.");
+            return;
+        }
+        m_dialogIsRunning = true;
+
         System.out.println("Asking whether to allow " + phoneNumber);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -139,11 +148,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 PingDbHelper database = new PingDbHelper(getApplicationContext());
                 database.addWhitelistContact(phoneNumber);
                 System.out.println("Added " + phoneNumber + " to whitelist.");
+                m_dialogIsRunning = false;
             }
         });
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User cancelled the dialog
+                m_dialogIsRunning = false;
             }
         });
 
