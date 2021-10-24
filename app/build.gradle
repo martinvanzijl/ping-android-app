@@ -39,6 +39,8 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:18.0.0'
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'androidx.fragment:fragment:1.3.6'
+    implementation files('libs\\android-logging-log4j-1.0.3.jar')
+    implementation files('libs\\log4j-1.2.17.jar')
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.testng:testng:6.9.6'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
