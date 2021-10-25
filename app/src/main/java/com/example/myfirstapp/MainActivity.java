@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Avoid showing more than one dialog at a time.
         if (m_dialogIsRunning) {
-            System.out.println("Ignoring request from " + phoneNumber + " since dialog is alraedy running.");
+            System.out.println("Ignoring request from " + phoneNumber + " since dialog is already running.");
             return;
         }
         m_dialogIsRunning = true;
