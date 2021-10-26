@@ -11,6 +11,7 @@ import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
@@ -34,6 +35,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -208,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // This causes an exception.
         //Logger.getLogger("MainActivity").info("Started app.");
-        appendLog("Hello");
+        //appendLog("Hello");
     }
 
     // Create the channel for notifications.
@@ -229,6 +231,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void onButtonStartServiceClick(View view) {
+//        Logger.info(this, "Start service button clicked.");
+        appendLog("Start service button clicked.");
+
         // Check for required permissions.
         String[] requiredPermissions = new String[] {
                 Manifest.permission.READ_SMS,
@@ -500,25 +505,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // Test writing to a file.
     public void appendLog(String text)
     {
-        File dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-        String fileName = dir + "/log.txt";
-        File logFile = new File(fileName);
-        Log.i("Log File Name", logFile.getAbsolutePath());
-        if (!logFile.exists())
-        {
-            try
-            {
+        // Check if enabled in settings.
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        boolean enabled = sharedPreferences.getBoolean("enable_logging", false);
+
+        // Exit if not enabled.
+        if (!enabled) {
+            return;
+        }
+
+        // Write message.
+        try {
+            // Get the file name.
+    //        File dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+            File dir = getLogFileDir();
+            String fileName = dir + "/log.txt";
+            File logFile = new File(fileName);
+
+            // Create log file if it does not exist.
+            if (!logFile.exists()) {
                 logFile.createNewFile();
             }
-            catch (IOException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        try
-        {
-            //BufferedWriter for performance, true to set append to file flag
+
+            // Write the message.
             BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
             buf.append(text);
             buf.newLine();
@@ -526,8 +536,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         catch (IOException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.w("Logging", e.getLocalizedMessage());
         }
     }
 
@@ -553,5 +562,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    // Return the directory for storing log files.
+    public static File getLogFileDir() throws IOException {
+        File documentsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        File logDir = new File(documentsDir + File.separator + "log-files");
+
+        if (!logDir.exists()) {
+            Log.i("Log Files", "Creating logs directory");
+            boolean result = logDir.mkdir();
+
+            if (result == false) {
+                Log.w("Log Files", "Could not create directory.");
+                logDir = documentsDir;
+            }
+        }
+
+        return logDir;
     }
 }
