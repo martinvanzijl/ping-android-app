@@ -20,4 +20,12 @@
     <string name="button_clear_label">Remove All Entries</string>
     <string name="button_main_screen_label">Back to Main Screen</string>
     <string name="map_view_description">A map showing the location of the pinged phone.</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preference Titles -->
+    <string name="logging_header">Logging</string>
+
+    <!-- Sync Preferences -->
+    <string name="enable_logging_title">Enable logging</string>
+    <string name="action_settings">Settings</string>
 </resources>
