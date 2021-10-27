@@ -7,22 +7,46 @@ import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
-import de.mindpipe.android.logging.log4j.LogConfigurator;
-
 public class Logger {
-    private final static LogConfigurator mLogConfigrator = new LogConfigurator();
-    private static boolean m_setupOK = false;
+    // Write a message to the log file.
+    public static void appendLog(Context context, String text)
+    {
+        // Check if enabled in settings.
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(context);
+        boolean enabled = sharedPreferences.getBoolean("enable_logging", false);
 
-    static {
-        try {
-            configureLog4j();
-            m_setupOK = true;
+        // Exit if not enabled.
+        if (!enabled) {
+            return;
         }
-        catch (IOException e) {
-            Log.w("Logger", e.getLocalizedMessage());
+
+        // Write message.
+        try {
+            // Get the file name.
+            File dir = getLogFileDir();
+            String fileName = dir + "/log.txt";
+            File logFile = new File(fileName);
+
+            // Create log file if it does not exist.
+            if (!logFile.exists()) {
+                logFile.createNewFile();
+            }
+
+            // Write the message.
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+            buf.append(text);
+            buf.newLine();
+            buf.close();
+        }
+        catch (IOException e)
+        {
+            Log.w("Logging", e.getLocalizedMessage());
         }
     }
 
@@ -42,48 +66,5 @@ public class Logger {
         }
 
         return logDir;
-    }
-
-    private static void configureLog4j() throws IOException {
-//        String fileName = Environment.getExternalStorageDirectory() + "/" + "log4j.log";
-        String fileName = getLogFileDir() + "/" + "log4j.txt";
-        String filePattern = "%d - [%c] - %p : %m%n";
-        int maxBackupSize = 10;
-        long maxFileSize = 1024 * 1024;
-
-        configure(fileName, filePattern, maxBackupSize, maxFileSize);
-    }
-
-    private static void configure(String fileName, String filePattern, int maxBackupSize, long maxFileSize) {
-        mLogConfigrator.setFileName(fileName);
-        mLogConfigrator.setMaxFileSize(maxFileSize);
-        mLogConfigrator.setFilePattern(filePattern);
-        mLogConfigrator.setMaxBackupSize(maxBackupSize);
-        mLogConfigrator.setUseLogCatAppender(true);
-        mLogConfigrator.configure();
-    }
-
-    public static void info(Context context, String message) {
-
-        // Check if enabled in settings.
-        SharedPreferences sharedPreferences =
-                PreferenceManager.getDefaultSharedPreferences(context);
-        boolean enabled = sharedPreferences.getBoolean("enable_logging", false);
-
-        // Log if all OK.
-        if (m_setupOK && enabled) {
-            try {
-                Log.i("Logging", "Writing log message.");
-                getLogger("Ping").info(message);
-            }
-            catch (Exception e) {
-                Log.w("Logging", e.getLocalizedMessage());
-            }
-        }
-    }
-
-    public static org.apache.log4j.Logger getLogger(String name) {
-        org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(name);
-        return logger;
     }
 }

@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // This causes an exception.
         //Logger.getLogger("MainActivity").info("Started app.");
-        //appendLog("Hello");
+        appendLog("Started app.");
     }
 
     // Create the channel for notifications.
@@ -252,6 +252,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void onButtonStopServiceClick(View view) {
+        appendLog("Stop service button clicked.");
+
         Intent intent = new Intent(this, TextService.class);
         intent.setAction(TextService.STOP);
         startService(intent);
@@ -502,42 +504,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return contactName;
     }
 
-    // Test writing to a file.
-    public void appendLog(String text)
-    {
-        // Check if enabled in settings.
-        SharedPreferences sharedPreferences =
-                PreferenceManager.getDefaultSharedPreferences(this);
-        boolean enabled = sharedPreferences.getBoolean("enable_logging", false);
-
-        // Exit if not enabled.
-        if (!enabled) {
-            return;
-        }
-
-        // Write message.
-        try {
-            // Get the file name.
-    //        File dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-            File dir = getLogFileDir();
-            String fileName = dir + "/log.txt";
-            File logFile = new File(fileName);
-
-            // Create log file if it does not exist.
-            if (!logFile.exists()) {
-                logFile.createNewFile();
-            }
-
-            // Write the message.
-            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
-            buf.append(text);
-            buf.newLine();
-            buf.close();
-        }
-        catch (IOException e)
-        {
-            Log.w("Logging", e.getLocalizedMessage());
-        }
+    // Write a message to the log file.
+    public void appendLog(String message) {
+        Logger.appendLog(this, message);
     }
 
     @Override
@@ -562,23 +531,5 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    // Return the directory for storing log files.
-    public static File getLogFileDir() throws IOException {
-        File documentsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-        File logDir = new File(documentsDir + File.separator + "log-files");
-
-        if (!logDir.exists()) {
-            Log.i("Log Files", "Creating logs directory");
-            boolean result = logDir.mkdir();
-
-            if (result == false) {
-                Log.w("Log Files", "Could not create directory.");
-                logDir = documentsDir;
-            }
-        }
-
-        return logDir;
     }
 }

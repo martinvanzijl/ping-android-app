@@ -84,6 +84,8 @@ public class TextService extends Service {
         unregisterReceiver(smsReceiver);
         m_isRunning = false;
         broadcastStatusChange();
+
+        appendLog("Service destroyed.");
     }
 
     // Broadcast to activity that status has been changed.
@@ -98,6 +100,8 @@ public class TextService extends Service {
     private class SmsReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            appendLog("Text message received.");
+
             String number = "";
             StringBuilder body = new StringBuilder();
 
@@ -144,6 +148,11 @@ public class TextService extends Service {
 
             return smsMessage;
         }
+    }
+
+    // Write a message to the log file.
+    private void appendLog(String message) {
+        Logger.appendLog(getApplicationContext(), message);
     }
 
     private void processPingResponse(String text, String phoneNumber) {
@@ -195,9 +204,12 @@ public class TextService extends Service {
 
     // Send a text message.
     private void sendText(String number, String text) {
+        appendLog("Trying to send text message.");
+
         try {
             SmsManager manager = SmsManager.getDefault();
             manager.sendTextMessage(number, null, text, null, null);
+            appendLog("Text message sent.");
         } catch (SecurityException e) {
             System.out.println(e.getLocalizedMessage());
         }
@@ -205,6 +217,8 @@ public class TextService extends Service {
 
     // Send a ping reply to the given number.
     private void sendPingReply(String phoneNumber) {
+        appendLog("Trying to send ping reply.");
+
         // Get the location provider.
         FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
