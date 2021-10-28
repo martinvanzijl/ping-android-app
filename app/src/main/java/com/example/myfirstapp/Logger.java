@@ -11,18 +11,25 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Logger {
-    // Write a message to the log file.
-    public static void appendLog(Context context, String text)
-    {
+
+    // Check if logging is enabled.
+    private static boolean loggingEnabled(Context context) {
         // Check if enabled in settings.
         SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(context);
         boolean enabled = sharedPreferences.getBoolean("enable_logging", false);
+        return enabled;
+    }
 
+    // Write a message to the log file.
+    public static void appendLog(Context context, String text)
+    {
         // Exit if not enabled.
-        if (!enabled) {
+        if (!loggingEnabled(context)) {
             return;
         }
 
@@ -38,9 +45,17 @@ public class Logger {
                 logFile.createNewFile();
             }
 
+            // Get the timestamp.
+            Date date = new Date();
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String timestamp = format.format(date);
+
+            // Format the message.
+            String message = timestamp + ": " + text;
+
             // Write the message.
             BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
-            buf.append(text);
+            buf.append(message);
             buf.newLine();
             buf.close();
         }
