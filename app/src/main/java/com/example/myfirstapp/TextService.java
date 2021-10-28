@@ -225,6 +225,7 @@ public class TextService extends Service {
         // Check that the right permissions have been granted.
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             System.out.println("No permission for getting location information.");
+            appendLog("No permission to get location data.");
             return;
         }
 
@@ -238,9 +239,11 @@ public class TextService extends Service {
                         // GPS location can be null if GPS is switched off
                         // or not gotten in reasonable time.
                         if (location != null) {
+                            appendLog("Got current location.");
                             onAddressLocated(phoneNumber, location);
                         }
                         else {
+                            appendLog("Current location was null.");
                             replyWithLastLocation(phoneNumber);
                         }
                     }
@@ -249,6 +252,7 @@ public class TextService extends Service {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         System.out.println("Error trying to get current GPS location");
+                        appendLog("Failed to get current location.");
                         replyWithLastLocation(phoneNumber);
                     }
                 });
@@ -274,7 +278,11 @@ public class TextService extends Service {
 
                         // GPS location can be null if GPS is switched off
                         if (location != null) {
+                            appendLog("Got last location.");
                             onAddressLocated(phoneNumber, location);
+                        }
+                        else {
+                            appendLog("Last location was null.");
                         }
                     }
                 })
@@ -282,6 +290,7 @@ public class TextService extends Service {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         System.out.println("Error trying to get last GPS location");
+                        appendLog("Failed to get last location.");
                     }
                 });
     }
