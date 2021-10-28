@@ -57,7 +57,7 @@ public class Logger {
 
         if (!logDir.exists()) {
             Log.i("Log Files", "Creating logs directory");
-            boolean result = logDir.mkdir();
+            boolean result = logDir.mkdirs();
 
             if (result == false) {
                 Log.w("Log Files", "Could not create directory.");
