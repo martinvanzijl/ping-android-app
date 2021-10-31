@@ -11,13 +11,21 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+// An adapter for the list view to display Ping contacts. This contains a set
+// of values and optional display text.
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
     private List<String> data;
+    private List<String> displayValues = null;
     private int selectedPos = RecyclerView.NO_POSITION;
     private View selectedView = null;
 
     public CustomAdapter (List<String> data){
         this.data = data;
+    }
+
+    // Set the display values to use. This must have a value for each entry.
+    public void setDisplayValues(List<String> displayValues) {
+        this.displayValues = displayValues;
     }
 
     @NonNull
@@ -29,8 +37,25 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(CustomAdapter.ViewHolder holder, int position) {
-        holder.textView.setText(this.data.get(position));
+        holder.textView.setText(getDisplayText(position));
         holder.itemView.setSelected(selectedPos == position);
+    }
+
+    // Get the text to display at the given position.
+    private String getDisplayText(int position) {
+        // Get value text.
+        String text = data.get(position);
+
+        // Override with display text if defined.
+        if (displayValues != null) {
+            String displayValue = displayValues.get(position);
+            if (!displayValue.isEmpty()) {
+                text = displayValue;
+            }
+        }
+
+        // Return display value.
+        return text;
     }
 
     @Override
@@ -42,7 +67,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         return selectedPos != RecyclerView.NO_POSITION;
     }
 
-    public String getSelectedText() {
+    public String getSelectedValue() {
         return this.data.get(selectedPos);
     }
 

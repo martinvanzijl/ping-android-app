@@ -1,7 +1,5 @@
 package com.example.myfirstapp;
 
-import androidx.annotation.LayoutRes;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -10,7 +8,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -19,8 +16,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +41,7 @@ public class WhitelistActivity extends AppCompatActivity {
     }
 
     private List<String> readFromDatabase() {
+        // Read numbers from database.
         PingDbHelper database = new PingDbHelper(this);
         Cursor cursor = database.getWhitelistContacts();
         List<String> contacts = new ArrayList<>();
@@ -100,7 +96,7 @@ public class WhitelistActivity extends AppCompatActivity {
 
         assert adapter != null;
         if (adapter.isItemSelected()) {
-            String phoneNumber = adapter.getSelectedText();
+            String phoneNumber = adapter.getSelectedValue();
             PingDbHelper database = new PingDbHelper(this);
             database.deleteWhitelistContact(phoneNumber);
             updateListView();
@@ -109,7 +105,23 @@ public class WhitelistActivity extends AppCompatActivity {
 
     private void updateListView() {
         RecyclerView listView = findViewById(R.id.recyclerViewMain);
-        listView.setAdapter(new CustomAdapter(readFromDatabase()));
+
+        // Read phone numbers.
+        List<String> phoneNumbers = readFromDatabase();
+
+        // Look up contact names.
+        List<String> names = new ArrayList<>();
+        for (String number: phoneNumbers) {
+            String name = MainActivity.getContactName(number, this);
+            names.add(name);
+        }
+
+        // Create adapter.
+        CustomAdapter adapter = new CustomAdapter(readFromDatabase());
+        adapter.setDisplayValues(names);
+
+        // Update list view.
+        listView.setAdapter(adapter);
     }
 
     @Override

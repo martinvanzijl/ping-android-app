@@ -485,7 +485,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // Look up contact name from phone number.
     // From:
     // https://stackoverflow.com/questions/3079365/android-retrieve-contact-name-from-phone-number
-    public String getContactName(final String phoneNumber, Context context)
+    public static String getContactName(final String phoneNumber, Context context)
     {
         Uri uri=Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,Uri.encode(phoneNumber));
 

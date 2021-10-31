@@ -14,7 +14,7 @@
     <string name="ping_request_sent_message">Ping request sent to %1$s.</string>
     <string name="button_whitelist_label">Choose Who can Ping Me</string>
     <string name="text_view_whitelist_text">The following phones can ping me:</string>
-    <string name="button_add_label">Choose a Number to Add</string>
+    <string name="button_add_label">Choose a Contact to Add</string>
     <string name="text_view_placeholder">555 1234</string>
     <string name="button_delete_label">Remove Selected Entry</string>
     <string name="button_clear_label">Remove All Entries</string>
