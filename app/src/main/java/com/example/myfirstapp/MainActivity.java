@@ -482,16 +482,31 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         startActivity(intent);
     }
 
+    // Check if the context has the permission.
+    private static boolean checkForPermission(Context context, String permission) {
+        return ContextCompat.checkSelfPermission(context, permission) ==
+                PackageManager.PERMISSION_GRANTED;
+    }
+
     // Look up contact name from phone number.
     // From:
     // https://stackoverflow.com/questions/3079365/android-retrieve-contact-name-from-phone-number
     public static String getContactName(final String phoneNumber, Context context)
     {
+        // Default to empty string.
+        String contactName="";
+
+        // Check for permissions first.
+        if (!checkForPermission(context, Manifest.permission.READ_CONTACTS)) {
+            Log.w("Contact Name", "No permission to read contacts.");
+            return contactName;
+        }
+
+        // Read the contact name from the database.
         Uri uri=Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI,Uri.encode(phoneNumber));
 
         String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME};
 
-        String contactName="";
         Cursor cursor=context.getContentResolver().query(uri,projection,null,null,null);
 
         if (cursor != null) {
