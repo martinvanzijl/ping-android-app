@@ -8,5 +8,12 @@
             app:title="@string/enable_logging_title" />
 
     </PreferenceCategory>
+    <PreferenceCategory android:title="Address Information">
+
+    </PreferenceCategory>
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="include_address_in_reply"
+        android:title="Include address in ping replies" />
 
 </PreferenceScreen>

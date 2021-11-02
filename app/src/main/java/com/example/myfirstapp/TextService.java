@@ -6,7 +6,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationRequest;
 import android.os.Build;
@@ -14,12 +17,14 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -28,6 +33,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.OnTokenCanceledListener;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -301,10 +309,51 @@ public class TextService extends Service {
 
         StringBuilder builder = new StringBuilder();
         builder.append(MainActivity.PING_REPLY_START);
+
+        // Include address information if the preference is set.
+        if (sendAddressEnabled()) {
+            builder.append("\nAddress: ").append(getAddressFor(location));
+        }
+
         builder.append("\nLatitude: ").append(location.getLatitude());
         builder.append("\nLongitude: ").append(location.getLongitude());
         String message = builder.toString();
         sendText(phoneNumber, message);
+    }
+
+    // Get the address for the given location.
+    // From: https://stackoverflow.com/questions/9409195/how-to-get-complete-address-from-latitude-and-longitude
+    private String getAddressFor(Location location) {
+        try {
+            double latitude = location.getLatitude();
+            double longitude = location.getLongitude();
+
+            Geocoder geocoder;
+            List<Address> addresses;
+            geocoder = new Geocoder(this, Locale.getDefault());
+
+            addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+
+            String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+//        String city = addresses.get(0).getLocality();
+//        String state = addresses.get(0).getAdminArea();
+//        String country = addresses.get(0).getCountryName();
+//        String postalCode = addresses.get(0).getPostalCode();
+//        String knownName = addresses.get(0).getFeatureName(); // Only if available else return NULL
+
+            return address;
+        } catch (IOException e) {
+            Log.w("Address", e.getLocalizedMessage());
+            return "Unknown (Exception)";
+        }
+    }
+
+    // Check whether or not to send the address in replies.
+    private boolean sendAddressEnabled() {
+        // Read value from settings.
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPreferences.getBoolean("include_address_in_reply", false);
     }
 
     /**
