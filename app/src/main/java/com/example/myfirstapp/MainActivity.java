@@ -120,11 +120,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        mMarker = mMap.addMarker(new MarkerOptions().position(position).title("Pinged Phone"));
 
         // Place or update the marker.
-        if (mMarkers.containsKey(phoneNumber)) {
+        if (mMarkers.containsKey(phoneNumber) && !showLocationHistoryEnabled()) {
+            // Update the existing marker for the contact.
             Marker marker = mMarkers.get(phoneNumber);
             marker.setPosition(position);
         }
         else {
+            // Place a new marker.
             String markerText = phoneNumber;
             String contactName = getContactName(phoneNumber, this);
             if (contactName != null && !contactName.isEmpty()) {
@@ -136,6 +138,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Go to the placed marker.
         mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+    }
+
+    // Check if "show location history" is enabled.
+    private boolean showLocationHistoryEnabled() {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPreferences.getBoolean("show_location_history", false);
     }
 
     // Ask whether to allow a ping request.
