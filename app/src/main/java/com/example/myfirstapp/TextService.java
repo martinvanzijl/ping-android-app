@@ -344,6 +344,7 @@ public class TextService extends Service {
             return address;
         } catch (IOException e) {
             Log.w("Address", e.getLocalizedMessage());
+            appendLog("Exception getting address: " + e.getLocalizedMessage());
             return "Unknown (Exception)";
         }
     }
