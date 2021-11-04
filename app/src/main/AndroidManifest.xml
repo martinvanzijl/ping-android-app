@@ -21,6 +21,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyFirstApp">
         <activity
+            android:name=".HelpActivity"
+            android:exported="true"
+            android:label="@string/action_help" />
+        <activity
             android:name=".LoggingActivity"
             android:exported="true" />
         <activity

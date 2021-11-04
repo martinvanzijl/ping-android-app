@@ -32,4 +32,5 @@
     <string name="log_files_disabled">Logging is currently disabled. Enable this to help debug issues.</string>
     <string name="action_help">Help</string>
     <string name="action_logging">Logs (Debug)</string>
+    <string name="help_contents">Ping Help</string>
 </resources>
