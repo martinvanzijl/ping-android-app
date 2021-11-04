@@ -21,7 +21,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyFirstApp">
         <activity
-            android:name=".HelpActivity"
+            android:name=".LoggingActivity"
             android:exported="true" />
         <activity
             android:name=".SettingsActivity"

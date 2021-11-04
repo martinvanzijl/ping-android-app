@@ -12,12 +12,12 @@ import android.widget.TextView;
 
 import java.io.IOException;
 
-public class HelpActivity extends AppCompatActivity {
+public class LoggingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_help);
+        setContentView(R.layout.activity_logging);
 
         // Add "back" button at top left.
         ActionBar actionBar = getSupportActionBar();
