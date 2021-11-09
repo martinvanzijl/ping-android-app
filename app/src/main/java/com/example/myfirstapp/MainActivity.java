@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -578,12 +579,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void setMapExpanded(boolean expanded) {
         int visibility = expanded ? View.GONE : View.VISIBLE;
 
+        // Show or hide other components.
         findViewById(R.id.buttonPing).setVisibility(visibility);
         findViewById(R.id.textViewPingStatus).setVisibility(visibility);
         findViewById(R.id.buttonWhitelist).setVisibility(visibility);
         findViewById(R.id.textViewServiceStatus).setVisibility(visibility);
         findViewById(R.id.buttonStartService).setVisibility(visibility);
         findViewById(R.id.buttonStopService).setVisibility(visibility);
+
+        // Set image.
+        ImageView imageView = findViewById(R.id.imageViewExpandMap);
+        if (expanded) {
+            imageView.setImageResource(R.drawable.minimize_white);
+        }
+        else {
+            imageView.setImageResource(R.drawable.expand_white);
+        }
 
         m_mapIsExpanded = expanded;
     }
