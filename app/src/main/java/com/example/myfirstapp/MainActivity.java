@@ -164,6 +164,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 database.addWhitelistContact(phoneNumber);
                 System.out.println("Added " + phoneNumber + " to whitelist.");
                 m_dialogIsRunning = false;
+
+                // Also send the ping response.
+                Intent intent = new Intent(MainActivity.this, TextService.class);
+                intent.setAction(TextService.COMMAND_SEND_PING_RESPONSE);
+                intent.putExtra(TextService.INTENT_EXTRA_NUMBER, phoneNumber);
+                startService(intent);
             }
         });
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {

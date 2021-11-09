@@ -50,6 +50,8 @@ public class TextService extends Service {
     public static final String PING_RESPONSE_LATITUDE = "PING_RESPONSE_LATITUDE";
     public static final String PING_RESPONSE_LONGITUDE = "PING_RESPONSE_LONGITUDE";
     public static final String PING_RESPONSE_CONTACT_NAME = "PING_RESPONSE_CONTACT_NAME";
+    public static final String COMMAND_SEND_PING_RESPONSE = "COMMAND_SEND_PING_RESPONSE";
+    public static final String INTENT_EXTRA_NUMBER = "INTENT_EXTRA_NUMBER";
 
     // Hack to let activity know about status.
     private static boolean m_isRunning = false;
@@ -76,6 +78,12 @@ public class TextService extends Service {
             m_isRunning = false;
         } else {
             m_isRunning = true;
+        }
+
+        // Check whether to send response.
+        if (Objects.equals(action, COMMAND_SEND_PING_RESPONSE)) {
+            String number = intent.getStringExtra(INTENT_EXTRA_NUMBER);
+            sendPingReply(number);
         }
 
         // Let activity know about status.
