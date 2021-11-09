@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //    private Marker mMarker;
     private final Map<String, Marker> mMarkers = new HashMap<>();
     private boolean m_dialogIsRunning = false;
+    private boolean m_mapIsExpanded = false;
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -564,5 +565,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onExpandMapClick(View view) {
+        toggleMapExpanded();
+    }
+
+    private void toggleMapExpanded() {
+        setMapExpanded(!m_mapIsExpanded);
+    }
+
+    private void setMapExpanded(boolean expanded) {
+        int visibility = expanded ? View.GONE : View.VISIBLE;
+
+        findViewById(R.id.buttonPing).setVisibility(visibility);
+        findViewById(R.id.textViewPingStatus).setVisibility(visibility);
+        findViewById(R.id.buttonWhitelist).setVisibility(visibility);
+        findViewById(R.id.textViewServiceStatus).setVisibility(visibility);
+        findViewById(R.id.buttonStartService).setVisibility(visibility);
+        findViewById(R.id.buttonStopService).setVisibility(visibility);
+
+        m_mapIsExpanded = expanded;
     }
 }

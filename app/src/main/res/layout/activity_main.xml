@@ -99,4 +99,16 @@
         tools:context=".MapsActivity"
         tools:layout="@layout/map_fragment" />
 
+    <ImageView
+        android:id="@+id/imageViewExpandMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:clickable="true"
+        android:onClick="onExpandMapClick"
+        app:layout_constraintEnd_toEndOf="@+id/map"
+        app:layout_constraintTop_toTopOf="@+id/map"
+        app:srcCompat="@drawable/expand_white" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
