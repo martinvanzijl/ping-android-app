@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.telephony.PhoneNumberUtils;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,13 @@ public class PingDbHelper extends SQLiteOpenHelper {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-    public long addWhitelistContact(String phoneNumber) {
+    public void addWhitelistContact(String phoneNumber) {
+        // Avoid adding the same contact twice.
+        if (whitelistContactExists(phoneNumber)) {
+            Log.w("Database", "Contact already in whitelist, so not added again.");
+            return;
+        }
+
         // Gets the data repository in write mode
         SQLiteDatabase db = getWritableDatabase();
 
@@ -42,9 +49,9 @@ public class PingDbHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(PingDatabaseContract.WhitelistContactEntry.COLUMN_NAME_PHONE_NUMBER, phoneNumber);
 
-        // Insert the new row, returning the primary key value of the new row
+        // Insert the new row
         long newRowId = db.insert(PingDatabaseContract.WhitelistContactEntry.TABLE_NAME, null, values);
-        return newRowId;
+//        return newRowId;
     }
 
     public Cursor getWhitelistContacts() {

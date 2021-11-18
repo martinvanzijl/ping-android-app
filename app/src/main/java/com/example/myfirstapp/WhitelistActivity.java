@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -178,6 +179,15 @@ public class WhitelistActivity extends AppCompatActivity {
     void addContact(String phoneNumber) {
         // Update database.
         PingDbHelper database = new PingDbHelper(this);
+
+        // Avoid adding the same contact twice.
+        if (database.whitelistContactExists(phoneNumber)) {
+            Toast message = Toast.makeText(this, "Contact is already in the list.", Toast.LENGTH_SHORT);
+            message.show();
+            return;
+        }
+
+        // Add the contact.
         database.addWhitelistContact(phoneNumber);
 
         // Update list view.
