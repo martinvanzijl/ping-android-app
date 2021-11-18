@@ -20,4 +20,4 @@ Ping is an Android app to find the location of another phone. To use Ping:
 
 If you use Ping, please consider donating to me.
 
-[Donate with PayPal](http://example.com/donate/)
+[Donate with PayPal](https://www.paypal.com/donate/?business=HVBTFCQUHSEY6&no_recurring=0&item_name=Your+donation+helps+me+to+keep+writing+free+and+open+source+software.&currency_code=NZD)
