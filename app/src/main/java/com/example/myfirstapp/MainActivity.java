@@ -142,8 +142,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return sharedPreferences.getBoolean("show_location_history", false);
     }
 
+    // Check if "ignore unlisted contacts" is enabled.
+    private boolean ignoreUnlistedContactsEnabled() {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPreferences.getBoolean("ignore_unlisted_contacts", false);
+    }
+
     // Ask whether to allow a ping request.
+    // Does nothing if the preference to ignore unlisted contacts is enabled.
     private void askWhetherToAllow(String phoneNumber) {
+
+        // Check preference.
+        if (ignoreUnlistedContactsEnabled()) {
+            appendLog("Ignoring request from non-whitelisted contact.");
+            return;
+        }
 
         // Avoid showing more than one dialog at a time.
         if (m_dialogIsRunning) {
