@@ -477,7 +477,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         try {
             SmsManager manager = SmsManager.getDefault();
             manager.sendTextMessage(number, null, PING_REQUEST_TEXT, null, null);
-            String labelMessage = getString(R.string.ping_request_sent_message, number);
+            String contactName = getContactName(number, this);
+            String labelMessage = getString(R.string.ping_request_sent_message, contactName);
             TextView view = findViewById(R.id.textViewPingStatus);
             view.setText(labelMessage);
         }
