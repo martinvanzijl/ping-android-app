@@ -149,6 +149,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return sharedPreferences.getBoolean("ignore_unlisted_contacts", false);
     }
 
+    // Check if "warn before stopping service" is enabled.
+    private boolean warnBeforeStoppingServiceEnabled() {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPreferences.getBoolean("warn_before_stop_service", false);
+    }
+
     // Ask whether to allow a ping request.
     // Does nothing if the preference to ignore unlisted contacts is enabled.
     private void askWhetherToAllow(String phoneNumber) {
@@ -278,6 +285,38 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onButtonStopServiceClick(View view) {
         appendLog("Stop service button clicked.");
 
+        // Check if user should confirm.
+        if (warnBeforeStoppingServiceEnabled()) {
+            appendLog("Confirming before stopping service.");
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Confirm");
+            builder.setMessage("Really stop the service?");
+
+            // Add the buttons
+            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    stopService();
+                }
+            });
+            builder.setNegativeButton("No", null);
+
+            // Create the AlertDialog
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+            // Return for now.
+            return;
+        }
+
+        // No need to confirm. Just stop the service.
+        stopService();
+    }
+
+    /**
+     * Stop the service.
+     */
+    private void stopService() {
         Intent intent = new Intent(this, TextService.class);
         intent.setAction(TextService.STOP);
         startService(intent);
