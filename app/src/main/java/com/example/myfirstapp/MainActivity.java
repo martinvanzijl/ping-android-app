@@ -156,6 +156,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return sharedPreferences.getBoolean("warn_before_stop_service", false);
     }
 
+    // Check if "automatically start service" is enabled.
+    private boolean autoStartServiceEnabled() {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPreferences.getBoolean("auto_start_service", false);
+    }
+
     // Ask whether to allow a ping request.
     // Does nothing if the preference to ignore unlisted contacts is enabled.
     private void askWhetherToAllow(String phoneNumber) {
@@ -242,6 +249,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // This causes an exception.
         //Logger.getLogger("MainActivity").info("Started app.");
         appendLog("Started app.");
+
+        // Automatically start service if setting is enabled.
+        if (autoStartServiceEnabled()) {
+            appendLog("Automatically starting service.");
+            startTextService();
+        }
     }
 
     // Create the channel for notifications.
@@ -265,6 +278,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        Logger.info(this, "Start service button clicked.");
         appendLog("Start service button clicked.");
 
+        startTextService();
+    }
+
+    /**
+     * Start the app service.
+     */
+    private void startTextService() {
         // Check for required permissions.
         String[] requiredPermissions = new String[] {
                 Manifest.permission.READ_SMS,
