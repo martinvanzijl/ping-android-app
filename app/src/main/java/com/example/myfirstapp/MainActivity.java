@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // Notify if the service has stopped.
     private void notifyIfServiceStopped() {
-        if (!TextService.isRunning()) {
+        if (!TextService.isRunning() && notificationWhenServiceStopsEnabled()) {
             Date date = new Date();
             //SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -154,6 +154,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(this);
         return sharedPreferences.getBoolean("warn_before_stop_service", false);
+    }
+
+    // Check if "give notification when service stops" is enabled.
+    private boolean notificationWhenServiceStopsEnabled() {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPreferences.getBoolean("give_notification_when_service_stops", true);
     }
 
     // Check if "automatically start service" is enabled.
