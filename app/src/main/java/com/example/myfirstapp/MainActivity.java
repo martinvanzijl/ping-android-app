@@ -1,6 +1,7 @@
 package com.example.myfirstapp;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -62,6 +63,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private final Map<String, Marker> mMarkers = new HashMap<>();
     private boolean m_dialogIsRunning = false;
     private boolean m_mapIsExpanded = false;
+    @SuppressLint("SimpleDateFormat")
+    private static final SimpleDateFormat SHORT_TIMESTAMP_FORMAT =
+            new SimpleDateFormat("hh:mm aa");
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -127,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (contactName != null && !contactName.isEmpty()) {
                 markerText = contactName;
             }
+            markerText += " (" + getShortTimestamp() + ")";
             Marker marker = mMap.addMarker(new MarkerOptions().position(position).title(markerText));
             mMarkers.put(phoneNumber, marker);
         }
@@ -678,5 +683,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         m_mapIsExpanded = expanded;
+    }
+
+    /**
+     * Create a short timestamp.
+     * @return A short timestamp.
+     */
+    private String getShortTimestamp() {
+        return SHORT_TIMESTAMP_FORMAT.format(new Date());
     }
 }
