@@ -280,15 +280,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         );
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        // "Hard stop" the service.
-        appendLog("Force service to stop.");
-        Intent intent = new Intent(MainActivity.this, TextService.class);
-        stopService(intent);
-    }
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//
+//        // "Hard stop" the service.
+//        appendLog("Force service to stop.");
+//        Intent intent = new Intent(MainActivity.this, TextService.class);
+//        stopService(intent);
+//    }
 
     // Create the channel for notifications.
     private void createNotificationChannel() {

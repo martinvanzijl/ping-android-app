@@ -88,7 +88,7 @@ public class TextService extends Service {
 
         // Let activity know about status.
         broadcastStatusChange();
-
+        
         // Keep the service active after activity is closed.
         return START_STICKY;
     }
