@@ -47,8 +47,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -60,7 +62,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int REQUEST_CODE_START_SERVICE = 1001;
     private GoogleMap mMap;
 //    private Marker mMarker;
-    private final Map<String, Marker> mMarkers = new HashMap<>();
+    private final Map<String, Marker> mLatestMarkers = new HashMap<>();
+    private final List<Marker> mHistoricMarkers = new ArrayList<>();
     private boolean m_dialogIsRunning = false;
     private boolean m_mapIsExpanded = false;
     @SuppressLint("SimpleDateFormat")
@@ -116,27 +119,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Add a marker and move the camera
         LatLng position = new LatLng(latitude, longitude);
 
-//        mMarker.remove();
-//        mMarker = mMap.addMarker(new MarkerOptions().position(position).title("Pinged Phone"));
-
-        // Place or update the marker.
-        if (mMarkers.containsKey(phoneNumber) && !showLocationHistoryEnabled()) {
-            // Update the existing marker for the contact.
-            Marker marker = mMarkers.get(phoneNumber);
+        // Hide the previous marker for the contact if "show history" is turned off.
+        if (mLatestMarkers.containsKey(phoneNumber) && !showLocationHistoryEnabled()) {
+            Marker marker = mLatestMarkers.get(phoneNumber);
             assert marker != null;
-            marker.setPosition(position);
+            marker.setVisible(false);
         }
-        else {
-            // Place a new marker.
-            String markerText = phoneNumber;
-            String contactName = getContactName(phoneNumber, this);
-            if (contactName != null && !contactName.isEmpty()) {
-                markerText = contactName;
-            }
-            markerText += " (" + getShortTimestamp() + ")";
-            Marker marker = mMap.addMarker(new MarkerOptions().position(position).title(markerText));
-            mMarkers.put(phoneNumber, marker);
+
+        // Place a new marker.
+        String markerText = phoneNumber;
+        String contactName = getContactName(phoneNumber, this);
+        if (contactName != null && !contactName.isEmpty()) {
+            markerText = contactName;
         }
+        markerText += " (" + getShortTimestamp() + ")";
+        Marker marker = mMap.addMarker(new MarkerOptions().position(position).title(markerText));
+
+        // Update map.
+        mLatestMarkers.put(phoneNumber, marker);
+
+        // Update list.
+        mHistoricMarkers.add(marker);
 
         // Go to the placed marker.
         mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
