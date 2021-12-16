@@ -280,6 +280,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         );
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // "Hard stop" the service.
+        appendLog("Force service to stop.");
+        Intent intent = new Intent(MainActivity.this, TextService.class);
+        stopService(intent);
+    }
+
     // Create the channel for notifications.
     private void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
@@ -337,7 +347,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             builder.setMessage("Really stop the service?");
 
             // Add the buttons
-            builder.setPositiveButton("Yes", (dialog, id) -> stopService());
+            builder.setPositiveButton("Yes", (dialog, id) -> pauseService());
             builder.setNegativeButton("No", null);
 
             // Create the AlertDialog
@@ -349,13 +359,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         // No need to confirm. Just stop the service.
-        stopService();
+        pauseService();
     }
 
     /**
      * Stop the service.
      */
-    private void stopService() {
+    private void pauseService() {
         Intent intent = new Intent(this, TextService.class);
         intent.setAction(TextService.STOP);
         startService(intent);
