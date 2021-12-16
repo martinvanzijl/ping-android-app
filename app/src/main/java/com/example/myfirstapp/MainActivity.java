@@ -28,6 +28,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @SuppressLint("SimpleDateFormat")
     private static final SimpleDateFormat SHORT_TIMESTAMP_FORMAT =
             new SimpleDateFormat("hh:mm aa");
+    private ActivityResultLauncher<Intent> chooseContactActivity = null;
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -263,6 +266,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             appendLog("Automatically starting service.");
             startTextService();
         }
+
+        // Create result handler.
+        chooseContactActivity = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                        Intent data = result.getData();
+                        assert data != null;
+                        pingPhone(data);
+                    }
+                }
+        );
     }
 
     // Create the channel for notifications.
@@ -488,37 +503,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void chooseContactToPing() {
         Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
                 Contacts.CONTENT_URI);
-        startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
+        chooseContactActivity.launch(contactPickerIntent);
     }
 
     public void onPingButtonClick(View view) {
         // Check for permissions first.
         if (checkForPermission(Manifest.permission.READ_CONTACTS, REQUEST_CODE_PICK_CONTACT)) {
             chooseContactToPing();
-        }
-    }
-
-    private static final int CONTACT_PICKER_RESULT = 1001;
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (resultCode == RESULT_OK) {
-            //noinspection SwitchStatementWithTooFewBranches
-            switch (requestCode) {
-                case CONTACT_PICKER_RESULT:
-                    // Handle contact results.
-                    System.out.println("Contact picked.");
-                    pingPhone(data);
-                    break;
-                default:
-                    System.out.println("Unexpected activity result code: " + requestCode);
-            }
-
-        } else {
-            // Gracefully handle failure.
-            System.out.println("Warning: Activity result not OK.");
         }
     }
 
