@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final SimpleDateFormat SHORT_TIMESTAMP_FORMAT =
             new SimpleDateFormat("hh:mm aa");
     private ActivityResultLauncher<Intent> chooseContactActivity = null;
+    private SharedPreferences.OnSharedPreferenceChangeListener prefListener = null;
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -281,6 +282,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 }
         );
+
+        // Create preference listener.
+        prefListener = (preferences, key) -> {
+            Log.i("Preferences", "Settings key changed: " + key);
+
+            // Handle location history preference change.
+            if (key.equals("show_location_history")) {
+                // Get value of preference.
+                boolean showHistoricMarkers = showLocationHistoryEnabled();
+
+                // Show or hide historic markers.
+                for (Marker marker: mHistoricMarkers) {
+                    marker.setVisible(showHistoricMarkers);
+                }
+
+                // Always show latest.
+                for (Marker marker: mLatestMarkers.values()) {
+                    marker.setVisible(true);
+                }
+            }
+        };
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(prefListener);
     }
 
 //    @Override
