@@ -8,7 +8,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -57,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     static final String PING_REQUEST_TEXT = "Sent from Ping App. Where are you?";
     private static final int REQUEST_CODE_PICK_CONTACT = 1000;
     private static final int REQUEST_CODE_START_SERVICE = 1001;
-    private ResponseReceiver receiver;
     private GoogleMap mMap;
 //    private Marker mMarker;
     private final Map<String, Marker> mMarkers = new HashMap<>();
@@ -70,11 +68,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMarker = mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     // Receives messages from the service.
@@ -82,19 +75,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         @Override
         public void onReceive(Context context, Intent intent) {
 //            System.out.println("Received broadcast.");
-            if (intent.getAction() == TextService.BROADCAST_ACTION) {
-                updateStatusLabel();
-                notifyIfServiceStopped();
-            }
-            else if(intent.getAction() == TextService.ASK_WHETHER_TO_ALLOW) {
-                String phoneNumber = intent.getStringExtra(Intent.EXTRA_TEXT);
-                askWhetherToAllow(phoneNumber);
-            }
-            else if (intent.getAction() == TextService.PING_RESPONSE_ACTION) {
-                double latitude = intent.getDoubleExtra(TextService.PING_RESPONSE_LATITUDE, 0);
-                double longitude = intent.getDoubleExtra(TextService.PING_RESPONSE_LONGITUDE, 0);
-                String phoneNumber = intent.getStringExtra(TextService.PING_RESPONSE_CONTACT_NAME);
-                placeMapMarker(phoneNumber, latitude, longitude);
+            switch (intent.getAction()) {
+                case TextService.BROADCAST_ACTION:
+                    updateStatusLabel();
+                    notifyIfServiceStopped();
+                    break;
+                case TextService.ASK_WHETHER_TO_ALLOW: {
+                    String phoneNumber = intent.getStringExtra(Intent.EXTRA_TEXT);
+                    askWhetherToAllow(phoneNumber);
+                    break;
+                }
+                case TextService.PING_RESPONSE_ACTION: {
+                    double latitude = intent.getDoubleExtra(TextService.PING_RESPONSE_LATITUDE, 0);
+                    double longitude = intent.getDoubleExtra(TextService.PING_RESPONSE_LONGITUDE, 0);
+                    String phoneNumber = intent.getStringExtra(TextService.PING_RESPONSE_CONTACT_NAME);
+                    placeMapMarker(phoneNumber, latitude, longitude);
+                    break;
+                }
             }
         }
     }
@@ -104,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (!TextService.isRunning() && notificationWhenServiceStopsEnabled()) {
             Date date = new Date();
             //SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            @SuppressLint("SimpleDateFormat")
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String message = "Service stopped at " + format.format(date) + ".";
             giveNotification(message);
@@ -122,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (mMarkers.containsKey(phoneNumber) && !showLocationHistoryEnabled()) {
             // Update the existing marker for the contact.
             Marker marker = mMarkers.get(phoneNumber);
+            assert marker != null;
             marker.setPosition(position);
         }
         else {
@@ -199,26 +198,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         builder.setMessage("Allow ping request from " + phoneNumber + "?");
 
         // Add the buttons
-        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // User clicked OK button
-                PingDbHelper database = new PingDbHelper(getApplicationContext());
-                database.addWhitelistContact(phoneNumber);
-                System.out.println("Added " + phoneNumber + " to whitelist.");
-                m_dialogIsRunning = false;
+        builder.setPositiveButton("Yes", (dialog, id) -> {
+            // User clicked OK button
+            PingDbHelper database = new PingDbHelper(getApplicationContext());
+            database.addWhitelistContact(phoneNumber);
+            System.out.println("Added " + phoneNumber + " to whitelist.");
+            m_dialogIsRunning = false;
 
-                // Also send the ping response.
-                Intent intent = new Intent(MainActivity.this, TextService.class);
-                intent.setAction(TextService.COMMAND_SEND_PING_RESPONSE);
-                intent.putExtra(TextService.INTENT_EXTRA_NUMBER, phoneNumber);
-                startService(intent);
-            }
+            // Also send the ping response.
+            Intent intent = new Intent(MainActivity.this, TextService.class);
+            intent.setAction(TextService.COMMAND_SEND_PING_RESPONSE);
+            intent.putExtra(TextService.INTENT_EXTRA_NUMBER, phoneNumber);
+            startService(intent);
         });
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // User cancelled the dialog
-                m_dialogIsRunning = false;
-            }
+        builder.setNegativeButton("No", (dialog, id) -> {
+            // User cancelled the dialog
+            m_dialogIsRunning = false;
         });
 
         // Create the AlertDialog
@@ -249,13 +244,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         filter.addAction(TextService.ASK_WHETHER_TO_ALLOW);
         filter.addAction(TextService.PING_RESPONSE_ACTION);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
-        receiver = new ResponseReceiver();
+        ResponseReceiver receiver = new ResponseReceiver();
         registerReceiver(receiver, filter);
 
         updateStatusLabel();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+        assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
         // This causes an exception.
@@ -326,11 +322,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             builder.setMessage("Really stop the service?");
 
             // Add the buttons
-            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    stopService();
-                }
-            });
+            builder.setPositiveButton("Yes", (dialog, id) -> stopService());
             builder.setNegativeButton("No", null);
 
             // Create the AlertDialog
@@ -409,6 +401,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // Check that the required permissions are granted.
     // If not, ask for permission with the given request code.
+    @SuppressWarnings("SameParameterValue")
     private boolean checkForPermissions(String[] permissions, int requestCode) {
 
         boolean mustAsk = false;
@@ -433,6 +426,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     // Check if a single permission is granted.
+    @SuppressWarnings("SameParameterValue")
     private boolean checkForPermission(String permission, int requestCode) {
         if (ContextCompat.checkSelfPermission(
                 getApplicationContext(), permission) ==
@@ -511,6 +505,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == RESULT_OK) {
+            //noinspection SwitchStatementWithTooFewBranches
             switch (requestCode) {
                 case CONTACT_PICKER_RESULT:
                     // Handle contact results.
@@ -579,6 +574,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     // Check if the context has the permission.
+    @SuppressWarnings("SameParameterValue")
     private static boolean checkForPermission(Context context, String permission) {
         return ContextCompat.checkSelfPermission(context, permission) ==
                 PackageManager.PERMISSION_GRANTED;
