@@ -106,13 +106,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // Notify if the service has stopped.
     private void notifyIfServiceStopped() {
         if (!TextService.isRunning() && notificationWhenServiceStopsEnabled()) {
-            Date date = new Date();
-            //SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-            @SuppressLint("SimpleDateFormat")
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String message = "Service stopped at " + format.format(date) + ".";
-            giveNotification(message);
+            giveServiceStoppedNotification();
         }
+    }
+
+    /**
+     * Show a notification that the service has stopped.
+     */
+    private void giveServiceStoppedNotification() {
+        Date date = new Date();
+        //SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String message = "Service stopped at " + format.format(date) + ".";
+        giveNotification(message);
     }
 
     // Update the map marker for the given number.
@@ -716,5 +723,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     private String getShortTimestamp() {
         return SHORT_TIMESTAMP_FORMAT.format(new Date());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // "Hard stop" the service.
+        appendLog("Force service to stop.");
+
+        // Give notification if required.
+        if (TextService.isRunning() && notificationWhenServiceStopsEnabled()) {
+            giveServiceStoppedNotification();
+        }
+
+        Intent intent = new Intent(MainActivity.this, TextService.class);
+        stopService(intent);
     }
 }
