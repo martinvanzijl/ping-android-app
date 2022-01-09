@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="map_types">
+        <item>@string/google_maps</item>
+        <item>@string/osm</item>
+    </string-array>
+    <string name="google_maps">Google Maps</string>
+    <string name="osm">Open Street Map (OSM)</string>
+</resources>

@@ -44,5 +44,13 @@
             android:key="give_notification_when_service_stops"
             android:title="Give notification when service stops" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="Map">
+        <ListPreference
+            android:entries="@array/map_types"
+            android:entryValues="@array/map_types"
+            android:defaultValue="@string/google_maps"
+            android:key="map_type"
+            android:title="Choose map type (requires restart)..." />
+    </PreferenceCategory>
 
 </PreferenceScreen>

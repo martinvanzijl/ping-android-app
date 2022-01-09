@@ -89,7 +89,6 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/textViewServiceStatus"
@@ -97,7 +96,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/buttonWhitelist"
         tools:context=".MapsActivity"
-        tools:layout="@layout/map_fragment" />
+        tools:layout="@layout/fragment_osm_map" />
 
     <ImageView
         android:id="@+id/imageViewExpandMap"
@@ -110,5 +109,16 @@
         app:layout_constraintEnd_toEndOf="@+id/map"
         app:layout_constraintTop_toTopOf="@+id/map"
         app:srcCompat="@drawable/expand_white" />
+
+    <TextView
+        android:id="@+id/textViewOSMCopyright"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoLink="web"
+        android:background="@color/copyright_background_color"
+        android:linksClickable="true"
+        android:text="@string/osm_copyright_text"
+        app:layout_constraintBottom_toBottomOf="@+id/map"
+        app:layout_constraintEnd_toEndOf="@id/map" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -33,4 +33,9 @@
     <string name="action_help">Help</string>
     <string name="action_logging">Logs (Debug)</string>
     <string name="help_contents">Ping Help</string>
+    <!-- Link works but is printed verbatim. -->
+<!--    <string name="osm_copyright_text"><![CDATA[© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors]]></string>-->
+    <!-- Link looks fine but does not work. -->
+    <string name="osm_copyright_text">© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors</string>
+<!--    <string name="osm_copyright_text">© &lt;a href="https://www.openstreetmap.org/copyright"&gt;OpenStreetMap&lt;/a&gt; contributors</string>-->
 </resources>

@@ -20,6 +20,8 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
 import android.telephony.SmsManager;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,6 +38,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -45,6 +50,14 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.osmdroid.api.IMapController;
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.OverlayItem;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -60,10 +73,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     static final String PING_REQUEST_TEXT = "Sent from Ping App. Where are you?";
     private static final int REQUEST_CODE_PICK_CONTACT = 1000;
     private static final int REQUEST_CODE_START_SERVICE = 1001;
-    private GoogleMap mMap;
+    private static final int OSM_MAP_REQUEST_CODE = 1002;
+    private GoogleMap mMap = null;
+    private MapView map = null;
+    private boolean m_usingOSM = true;
 //    private Marker mMarker;
-    private final Map<String, Marker> mLatestMarkers = new HashMap<>();
-    private final List<Marker> mHistoricMarkers = new ArrayList<>();
+    private final Map<String, MarkerProxy> mLatestMarkers = new HashMap<>();
+    private final List<MarkerProxy> mHistoricMarkers = new ArrayList<>();
     private boolean m_dialogIsRunning = false;
     private boolean m_mapIsExpanded = false;
     @SuppressLint("SimpleDateFormat")
@@ -129,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Hide the previous marker for the contact if "show history" is turned off.
         if (mLatestMarkers.containsKey(phoneNumber) && !showLocationHistoryEnabled()) {
-            Marker marker = mLatestMarkers.get(phoneNumber);
+            MarkerProxy marker = mLatestMarkers.get(phoneNumber);
             assert marker != null;
             marker.setVisible(false);
         }
@@ -140,17 +156,47 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (contactName != null && !contactName.isEmpty()) {
             markerText = contactName;
         }
-        markerText += " (" + getShortTimestamp() + ")";
-        Marker marker = mMap.addMarker(new MarkerOptions().position(position).title(markerText));
+        String timestamp = getShortTimestamp();
+        markerText += " (" + timestamp + ")";
+
+        // Make proxy.
+        MarkerProxy markerProxy = null;
+
+        if (!m_usingOSM) {
+            // Using Google Maps.
+            Marker marker = mMap.addMarker(new MarkerOptions().position(position).title(markerText));
+
+            // Set proxy.
+            markerProxy = new MarkerProxy(marker);
+
+            // Go to the placed marker.
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+        }
+
+        if (m_usingOSM) {
+            // Create point.
+            GeoPoint point = new GeoPoint(latitude, longitude);
+
+            // Add marker.
+            org.osmdroid.views.overlay.Marker mOverlay = new org.osmdroid.views.overlay.Marker(map);
+            mOverlay.setPosition(point);
+            mOverlay.setTitle(markerText);
+            mOverlay.setSubDescription("");
+            map.getOverlays().add(mOverlay);
+
+            // Set proxy.
+            markerProxy = new MarkerProxy(mOverlay);
+
+            // Move the camera to the point.
+            IMapController mapController = map.getController();
+            mapController.setCenter(point);
+        }
 
         // Update map.
-        mLatestMarkers.put(phoneNumber, marker);
+        mLatestMarkers.put(phoneNumber, markerProxy);
 
         // Update list.
-        mHistoricMarkers.add(marker);
-
-        // Go to the placed marker.
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+        mHistoricMarkers.add(markerProxy);
     }
 
     // Check if "show location history" is enabled.
@@ -251,7 +297,38 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Check if using OSM.
+        m_usingOSM = isOsmSelected();
+
+        // Load OsmDroid configuration. Do this before setting the layout.
+        Context ctx = getApplicationContext();
+        Configuration.getInstance().load(ctx, android.preference.PreferenceManager.getDefaultSharedPreferences(ctx));
+
+        Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
+
+        // Debug.
+        Log.i("Ping", "Map configuration loaded.");
+
+        // Set the layout.
         setContentView(R.layout.activity_main);
+
+        // Set the map fragment.
+        createMapFragment();
+
+        // Handle copyright label.
+        TextView textView = findViewById(R.id.textViewOSMCopyright);
+
+        if (m_usingOSM) {
+            // Add click handler to copyright label.
+            textView.setOnClickListener(view -> onTextViewOSMCopyRightClick());
+        }
+        else {
+            // Using Google Maps. Hide the label.
+            textView.setVisibility(View.GONE);
+        }
+
+        // Create the notification channel.
         createNotificationChannel();
 
         IntentFilter filter = new IntentFilter(TextService.BROADCAST_ACTION);
@@ -262,11 +339,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         registerReceiver(receiver, filter);
 
         updateStatusLabel();
-
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        assert mapFragment != null;
-        mapFragment.getMapAsync(this);
 
         // This causes an exception.
         //Logger.getLogger("MainActivity").info("Started app.");
@@ -300,12 +372,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 boolean showHistoricMarkers = showLocationHistoryEnabled();
 
                 // Show or hide historic markers.
-                for (Marker marker: mHistoricMarkers) {
+                for (MarkerProxy marker: mHistoricMarkers) {
                     marker.setVisible(showHistoricMarkers);
                 }
 
                 // Always show latest.
-                for (Marker marker: mLatestMarkers.values()) {
+                for (MarkerProxy marker: mLatestMarkers.values()) {
                     marker.setVisible(true);
                 }
             }
@@ -313,6 +385,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(prefListener);
+    }
+
+    /**
+     * Handle click on OSM copyright link.
+     */
+    private void onTextViewOSMCopyRightClick() {
+        String link = "https://www.openstreetmap.org/copyright";
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+        startActivity(browserIntent);
+    }
+
+    /**
+     * Check if OpenStreetMap is selected in the preferences.
+     * @return True if user selected OpenStreetMap.
+     */
+    private boolean isOsmSelected() {
+        // Get preference value.
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        String selectedOption = sharedPreferences.getString("map_type", "");
+
+        // Check if it is OSM.
+        return selectedOption.equals(getString(R.string.osm));
     }
 
 //    @Override
@@ -739,5 +834,80 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         Intent intent = new Intent(MainActivity.this, TextService.class);
         stopService(intent);
+    }
+
+    private void requestPermissionsIfNecessary(String[] permissions) {
+        ArrayList<String> permissionsToRequest = new ArrayList<>();
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // Permission is not granted
+                permissionsToRequest.add(permission);
+            }
+        }
+        if (permissionsToRequest.size() > 0) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    permissionsToRequest.toArray(new String[0]),
+                    OSM_MAP_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // Set up the map.
+        setUpMap();
+    }
+
+    /**
+     * Set up the OSM map.
+     */
+    private void setUpMap() {
+
+        if (m_usingOSM) {
+            // Get the fragment.
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.map);
+            OsmMapFragment osmMapFragment = (OsmMapFragment) fragment;
+
+            // Get the OSM map view.
+            assert osmMapFragment != null;
+            map = osmMapFragment.getMapView();
+
+            // Check that map exists.
+            assert map != null;
+        }
+        else if (mMap == null) {
+            // Use Google Maps.
+
+            // Get the map fragment.
+            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.map);
+            assert mapFragment != null;
+            mapFragment.getMapAsync(this);
+        }
+    }
+
+    /**
+     * Create the map fragment.
+     */
+    private void createMapFragment() {
+
+        // Create new fragment and transaction
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setReorderingAllowed(true);
+
+        // Replace whatever is in the fragment_container view with this fragment
+        if (m_usingOSM) {
+            transaction.add(R.id.map, com.example.myfirstapp.OsmMapFragment.class, null);
+        } else {
+            transaction.add(R.id.map, com.google.android.gms.maps.SupportMapFragment.class, null);
+        }
+
+        // Commit the transaction
+//        transaction.commitNow();
+        transaction.commit();
     }
 }
