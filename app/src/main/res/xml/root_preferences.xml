@@ -21,6 +21,11 @@
             android:defaultValue="false"
             android:key="show_location_history"
             android:title="Show location history" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="store_location_history"
+            android:title="Store location history in database" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Allowed Contacts">
 

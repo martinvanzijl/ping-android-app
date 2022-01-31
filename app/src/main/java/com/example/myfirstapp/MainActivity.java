@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -87,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             new SimpleDateFormat("hh:mm aa");
     private ActivityResultLauncher<Intent> chooseContactActivity = null;
     private SharedPreferences.OnSharedPreferenceChangeListener prefListener = null;
+    private PingDbHelper dbHelper = null;
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -112,7 +114,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     double latitude = intent.getDoubleExtra(TextService.PING_RESPONSE_LATITUDE, 0);
                     double longitude = intent.getDoubleExtra(TextService.PING_RESPONSE_LONGITUDE, 0);
                     String phoneNumber = intent.getStringExtra(TextService.PING_RESPONSE_CONTACT_NAME);
-                    placeMapMarker(phoneNumber, latitude, longitude);
+                    String address = intent.getStringExtra(TextService.PING_RESPONSE_ADDRESS);
+                    placeMapMarker(phoneNumber, latitude, longitude, address);
                     break;
                 }
             }
@@ -139,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     // Update the map marker for the given number.
-    private void placeMapMarker(String phoneNumber, double latitude, double longitude) {
+    private void placeMapMarker(String phoneNumber, double latitude, double longitude, String address) {
         // Add a marker and move the camera
         LatLng position = new LatLng(latitude, longitude);
 
@@ -197,6 +200,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Update list.
         mHistoricMarkers.add(markerProxy);
+
+        // Update database.
+        if (storeLocationHistoryEnabled()) {
+            dbHelper.addLocationHistory(phoneNumber, latitude, longitude, address, contactName);
+        }
     }
 
     // Check if "show location history" is enabled.
@@ -232,6 +240,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(this);
         return sharedPreferences.getBoolean("auto_start_service", false);
+    }
+
+    // Check if "store location history" is enabled.
+    private boolean storeLocationHistoryEnabled() {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPreferences.getBoolean("store_location_history", false);
     }
 
     // Ask whether to allow a ping request.
@@ -347,7 +362,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Automatically start service if setting is enabled.
         if (autoStartServiceEnabled()) {
             appendLog("Automatically starting service.");
-            startTextService();
+
+            try {
+                startTextService();
+            }
+            catch (IllegalStateException e) {
+                Log.w("Ping", e.getLocalizedMessage());
+                showToastMessage("Problem starting service.");
+            }
         }
 
         // Create result handler.
@@ -385,6 +407,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(prefListener);
+
+        dbHelper = new PingDbHelper(this);
+    }
+
+    /**
+     * Show a "toast" message.
+     * @param message The message.
+     */
+    protected void showToastMessage(String message) {
+        Context context = getApplicationContext();
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(context, message, duration);
+        toast.show();
     }
 
     /**
@@ -769,6 +804,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         else if (id == R.id.action_logging) {
             Intent intent = new Intent(this, LoggingActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        else if (id == R.id.action_location_history) {
+            Intent intent = new Intent(this, LocationHistoryActivity.class);
             startActivity(intent);
             return true;
         }

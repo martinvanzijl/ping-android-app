@@ -13,7 +13,7 @@ import java.util.List;
 
 public class PingDbHelper extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 3;
     public static final String DATABASE_NAME = "Ping.db";
 
     public PingDbHelper(Context context) {
@@ -22,12 +22,33 @@ public class PingDbHelper extends SQLiteOpenHelper {
 
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(PingDatabaseContract.SQL_CREATE_ENTRIES);
+        db.execSQL(PingDatabaseContract.SQL_CREATE_LOCATION_HISTORY);
+        Log.i("Ping", "Database structure updated.");
+
+//        Cursor cursor = db.query(
+//                PingDatabaseContract.LocationHistoryEntry.TABLE_NAME,
+//                null,
+//                null,
+//                null,
+//                null,
+//                null,
+//                null
+//        );
+//
+//        String columnNames = "";
+//        for (String name: cursor.getColumnNames()) {
+//            if (!columnNames.isEmpty()) {
+//                columnNames += ", ";
+//            }
+//            columnNames += name;
+//        }
+//
+//        Log.i("Ping", "History columns: " + columnNames);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // This database is only a cache for online data, so its upgrade policy is
-        // to simply to discard the data and start over
-        db.execSQL(PingDatabaseContract.SQL_DELETE_ENTRIES);
+//        db.execSQL(PingDatabaseContract.SQL_DELETE_ENTRIES);
+        db.execSQL(PingDatabaseContract.SQL_DELETE_LOCATION_HISTORY);
         onCreate(db);
     }
 
@@ -134,4 +155,52 @@ public class PingDbHelper extends SQLiteOpenHelper {
 //
 //        return (rows > 0);
 //    }
+
+    // Store a location history record.
+    public void addLocationHistory(String phoneNumber, double latitude, double longitude, String address, String contactName) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = getWritableDatabase();
+
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(PingDatabaseContract.LocationHistoryEntry.COLUMN_NAME_PHONE_NUMBER, phoneNumber);
+        values.put(PingDatabaseContract.LocationHistoryEntry.COLUMN_NAME_LATITUDE, latitude);
+        values.put(PingDatabaseContract.LocationHistoryEntry.COLUMN_NAME_LONGITUDE, longitude);
+        values.put(PingDatabaseContract.LocationHistoryEntry.COLUMN_NAME_ADDRESS, address);
+        values.put(PingDatabaseContract.LocationHistoryEntry.COLUMN_NAME_CONTACT_NAME, contactName);
+
+        // Insert the new row
+        long newRowId = db.insert(PingDatabaseContract.LocationHistoryEntry.TABLE_NAME, null, values);
+//        return newRowId;
+    }
+
+    /**
+     * Get the location history records.
+     */
+    public Cursor getLocationHistory() {
+        SQLiteDatabase db = getReadableDatabase();
+
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                PingDatabaseContract.LocationHistoryEntry.COLUMN_NAME_TIME,
+                PingDatabaseContract.LocationHistoryEntry.COLUMN_NAME_PHONE_NUMBER,
+                PingDatabaseContract.LocationHistoryEntry.COLUMN_NAME_LATITUDE,
+                PingDatabaseContract.LocationHistoryEntry.COLUMN_NAME_LONGITUDE,
+                PingDatabaseContract.LocationHistoryEntry.COLUMN_NAME_ADDRESS,
+                PingDatabaseContract.LocationHistoryEntry.COLUMN_NAME_CONTACT_NAME
+        };
+
+        Cursor cursor = db.query(
+                PingDatabaseContract.LocationHistoryEntry.TABLE_NAME, // The table to query
+                projection, // The array of columns to return (pass null to get all)
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        return cursor;
+    }
 }

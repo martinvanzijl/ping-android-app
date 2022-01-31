@@ -49,6 +49,7 @@ public class TextService extends Service {
     public static final String PING_RESPONSE_ACTION = "PING_RESPONSE";
     public static final String PING_RESPONSE_LATITUDE = "PING_RESPONSE_LATITUDE";
     public static final String PING_RESPONSE_LONGITUDE = "PING_RESPONSE_LONGITUDE";
+    public static final String PING_RESPONSE_ADDRESS = "PING_RESPONSE_ADDRESS";
     public static final String PING_RESPONSE_CONTACT_NAME = "PING_RESPONSE_CONTACT_NAME";
     public static final String COMMAND_SEND_PING_RESPONSE = "COMMAND_SEND_PING_RESPONSE";
     public static final String INTENT_EXTRA_NUMBER = "INTENT_EXTRA_NUMBER";
@@ -97,7 +98,13 @@ public class TextService extends Service {
 
     @Override
     public void onDestroy() {
-        unregisterReceiver(smsReceiver);
+        try {
+            unregisterReceiver(smsReceiver);
+        }
+        catch (IllegalArgumentException e) {
+            Log.w("Ping", "Receiver not registered, so cannot unregister.");
+        }
+
         m_isRunning = false;
         broadcastStatusChange();
 
@@ -174,6 +181,7 @@ public class TextService extends Service {
     private void processPingResponse(String text, String phoneNumber) {
         double latitude = 0;
         double longitude = 0;
+        String address = "";
         String[] lines = text.split("\n");
         for (String line: lines) {
             if (line.startsWith("Latitude: ")) {
@@ -184,6 +192,9 @@ public class TextService extends Service {
                 String numberString = line.replace("Longitude: ", "");
                 longitude = Double.parseDouble(numberString);
             }
+            else if (line.startsWith("Address: ")) {
+                address = line.replace("Address: ", "");
+            }
         }
         System.out.println("Broadcasting ping response.");
 
@@ -193,6 +204,7 @@ public class TextService extends Service {
         //intent.putExtra(Intent.EXTRA_TEXT, new LocationData(latitude, longitude));
         intent.putExtra(PING_RESPONSE_LATITUDE, latitude);
         intent.putExtra(PING_RESPONSE_LONGITUDE, longitude);
+        intent.putExtra(PING_RESPONSE_ADDRESS, address);
         intent.putExtra(PING_RESPONSE_CONTACT_NAME, phoneNumber);
         sendBroadcast(intent);
     }
