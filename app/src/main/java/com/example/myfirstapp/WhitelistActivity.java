@@ -1,5 +1,6 @@
 package com.example.myfirstapp;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -15,6 +16,7 @@ import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -39,6 +41,12 @@ public class WhitelistActivity extends AppCompatActivity {
         view.setLayoutManager(new LinearLayoutManager(this));
         view.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         updateListView();
+
+        // Add "back" button at top left.
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     private List<String> readFromDatabase() {
@@ -205,5 +213,14 @@ public class WhitelistActivity extends AppCompatActivity {
 
     public void onButtonMainScreenClick(View view) {
         finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
