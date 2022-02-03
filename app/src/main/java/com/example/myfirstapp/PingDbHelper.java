@@ -183,7 +183,8 @@ public class PingDbHelper extends SQLiteOpenHelper {
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
         String[] projection = {
-                PingDatabaseContract.LocationHistoryEntry.COLUMN_NAME_TIME,
+                "datetime(" + PingDatabaseContract.LocationHistoryEntry.COLUMN_NAME_TIME + ",'localtime') as " +
+                        PingDatabaseContract.LocationHistoryEntry.COLUMN_NAME_TIME,
                 PingDatabaseContract.LocationHistoryEntry.COLUMN_NAME_PHONE_NUMBER,
                 PingDatabaseContract.LocationHistoryEntry.COLUMN_NAME_LATITUDE,
                 PingDatabaseContract.LocationHistoryEntry.COLUMN_NAME_LONGITUDE,
