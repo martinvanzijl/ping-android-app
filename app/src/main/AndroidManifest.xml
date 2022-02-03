@@ -25,7 +25,8 @@
         android:theme="@style/Theme.MyFirstApp">
         <activity
             android:name=".LocationHistoryActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:label="@string/title_activity_location_history" />
         <activity
             android:name=".OsmMapActivity"
             android:exported="true" />
@@ -35,14 +36,16 @@
             android:label="@string/action_help" />
         <activity
             android:name=".LoggingActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:label="@string/title_activity_logging" />
         <activity
             android:name=".SettingsActivity"
             android:exported="true"
             android:label="@string/title_activity_settings" />
         <activity
             android:name=".WhitelistActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:label="@string/title_activity_whitelist" />
 
         <meta-data
             android:name="com.google.android.gms.car.application"
