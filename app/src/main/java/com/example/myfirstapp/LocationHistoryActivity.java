@@ -1,5 +1,6 @@
 package com.example.myfirstapp;
 
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -31,6 +32,7 @@ public class LocationHistoryActivity extends AppCompatActivity {
         // Connect signal handlers.
         findViewById(R.id.buttonExportLocationHistory).setOnClickListener(this::onButtonExportHistoryClick);
         findViewById(R.id.buttonEmailExportedFile).setOnClickListener(this::onButtonEmailClick);
+        findViewById(R.id.buttonDeleteLocationHistory).setOnClickListener(this::onButtonDeleteHistoryClick);
 
         // Create fields.
         dbHelper = new PingDbHelper(this);
@@ -40,6 +42,34 @@ public class LocationHistoryActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    private void onButtonDeleteHistoryClick(View view) {
+        showDeleteHistoryPrompt();
+    }
+
+    /**
+     * Ask whether to really delete location history or not.
+     */
+    private void showDeleteHistoryPrompt() {
+        // Create the builder.
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // Set the title and message.
+        builder.setTitle("Confirm");
+        builder.setMessage("Really delete location history?");
+
+        // Add the buttons.
+        builder.setPositiveButton("Yes", (dialog, id) -> {
+            // User clicked OK button.
+            dbHelper.clearLocationHistory();
+            showToastMessage("Location history deleted.");
+        });
+        builder.setNegativeButton("No", null);
+
+        // Create the dialog.
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void onButtonEmailClick(View view) {

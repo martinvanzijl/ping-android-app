@@ -30,5 +30,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/email_exported_file" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="16dp" />
+
+        <Button
+            android:id="@+id/buttonDeleteLocationHistory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/delete_location_history" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

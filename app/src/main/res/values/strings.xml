@@ -40,5 +40,6 @@
     <string name="action_location_history">Location History</string>
     <string name="export_location_history">Export Location History</string>
     <string name="email_exported_file">Email Exported File</string>
+    <string name="delete_location_history">Delete Location History</string>
     <!--    <string name="osm_copyright_text">© &lt;a href="https://www.openstreetmap.org/copyright"&gt;OpenStreetMap&lt;/a&gt; contributors</string>-->
 </resources>

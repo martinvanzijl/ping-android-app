@@ -204,4 +204,15 @@ public class PingDbHelper extends SQLiteOpenHelper {
 
         return cursor;
     }
+
+    /**
+     * Clear the location history table.
+     */
+    public void clearLocationHistory() {
+        // Gets the data repository in write mode.
+        SQLiteDatabase db = getWritableDatabase();
+
+        // Delete all rows.
+        db.delete(PingDatabaseContract.LocationHistoryEntry.TABLE_NAME, null, null);
+    }
 }
