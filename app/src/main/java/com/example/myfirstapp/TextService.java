@@ -179,34 +179,37 @@ public class TextService extends Service {
     }
 
     private void processPingResponse(String text, String phoneNumber) {
-        double latitude = 0;
-        double longitude = 0;
-        String address = "";
-        String[] lines = text.split("\n");
-        for (String line: lines) {
-            if (line.startsWith("Latitude: ")) {
-                String numberString = line.replace("Latitude: ", "");
-                latitude = Double.parseDouble(numberString);
+        try {
+            double latitude = 0;
+            double longitude = 0;
+            String address = "";
+            String[] lines = text.split("\n");
+            for (String line : lines) {
+                if (line.startsWith("Latitude: ")) {
+                    String numberString = line.replace("Latitude: ", "");
+                    latitude = Double.parseDouble(numberString);
+                } else if (line.startsWith("Longitude: ")) {
+                    String numberString = line.replace("Longitude: ", "");
+                    longitude = Double.parseDouble(numberString);
+                } else if (line.startsWith("Address: ")) {
+                    address = line.replace("Address: ", "");
+                }
             }
-            else if (line.startsWith("Longitude: ")) {
-                String numberString = line.replace("Longitude: ", "");
-                longitude = Double.parseDouble(numberString);
-            }
-            else if (line.startsWith("Address: ")) {
-                address = line.replace("Address: ", "");
-            }
-        }
-        System.out.println("Broadcasting ping response.");
+            System.out.println("Broadcasting ping response.");
 
-        Intent intent = new Intent();
-        intent.setAction(PING_RESPONSE_ACTION);
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
-        //intent.putExtra(Intent.EXTRA_TEXT, new LocationData(latitude, longitude));
-        intent.putExtra(PING_RESPONSE_LATITUDE, latitude);
-        intent.putExtra(PING_RESPONSE_LONGITUDE, longitude);
-        intent.putExtra(PING_RESPONSE_ADDRESS, address);
-        intent.putExtra(PING_RESPONSE_CONTACT_NAME, phoneNumber);
-        sendBroadcast(intent);
+            Intent intent = new Intent();
+            intent.setAction(PING_RESPONSE_ACTION);
+            intent.addCategory(Intent.CATEGORY_DEFAULT);
+            //intent.putExtra(Intent.EXTRA_TEXT, new LocationData(latitude, longitude));
+            intent.putExtra(PING_RESPONSE_LATITUDE, latitude);
+            intent.putExtra(PING_RESPONSE_LONGITUDE, longitude);
+            intent.putExtra(PING_RESPONSE_ADDRESS, address);
+            intent.putExtra(PING_RESPONSE_CONTACT_NAME, phoneNumber);
+            sendBroadcast(intent);
+        }
+        catch (NumberFormatException e) {
+             Log.w("Ping", e.getLocalizedMessage());
+        }
     }
 
     // Check if ping request is allowed from number.
