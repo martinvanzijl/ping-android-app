@@ -8,6 +8,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -59,5 +61,10 @@ public class LoggingActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void onViewLogsClick(View view) {
+        EditText field = findViewById(R.id.editTextLogs);
+        field.setText(Logger.getLogsAsString());
     }
 }

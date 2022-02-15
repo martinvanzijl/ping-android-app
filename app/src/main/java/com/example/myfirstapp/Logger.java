@@ -12,9 +12,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Logger {
+
+    // Hack in case logging to files does not work.
+    private static List<String> m_logsString = new ArrayList<>();
 
     // Check if logging is enabled.
     private static boolean loggingEnabled(Context context) {
@@ -36,6 +41,17 @@ public class Logger {
         // Write message to console.
         Log.i("Ping", text);
 
+        // Get the timestamp.
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String timestamp = format.format(date);
+
+        // Format the message.
+        String message = timestamp + ": " + text;
+
+        // Hack: Log internally.
+        m_logsString.add(message);
+
         // Write message to log file.
         try {
             // Get the file name.
@@ -47,14 +63,6 @@ public class Logger {
             if (!logFile.exists()) {
                 logFile.createNewFile();
             }
-
-            // Get the timestamp.
-            Date date = new Date();
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String timestamp = format.format(date);
-
-            // Format the message.
-            String message = timestamp + ": " + text;
 
             // Write the message.
             BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
@@ -84,5 +92,18 @@ public class Logger {
         }
 
         return logDir;
+    }
+
+    // Return the logs as a string.
+    public static String getLogsAsString() {
+        if (m_logsString.isEmpty()) {
+            return "Nothing has been logged yet.";
+        }
+
+        StringBuilder builder = new StringBuilder();
+        for (String message: m_logsString) {
+            builder.append(message).append("\n");
+        }
+        return builder.toString();
     }
 }
