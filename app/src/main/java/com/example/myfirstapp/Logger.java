@@ -33,7 +33,10 @@ public class Logger {
             return;
         }
 
-        // Write message.
+        // Write message to console.
+        Log.i("Ping", text);
+
+        // Write message to log file.
         try {
             // Get the file name.
             File dir = getLogFileDir();
