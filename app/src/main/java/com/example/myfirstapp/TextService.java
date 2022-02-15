@@ -19,19 +19,12 @@ import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.CancellationToken;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.OnTokenCanceledListener;
 
 import java.io.IOException;
 import java.util.List;
@@ -56,10 +49,9 @@ public class TextService extends Service {
 
     // Hack to let activity know about status.
     private static boolean m_isRunning = false;
-    private static String m_numberToAskAbout = "555 1234";
 
     // Receiver object for text messages.
-    SmsReceiver smsReceiver = new SmsReceiver();
+    final SmsReceiver smsReceiver = new SmsReceiver();
 
     @Nullable
     @Override
@@ -223,14 +215,13 @@ public class TextService extends Service {
         }
     }
 
-    private boolean askWhetherToAllow(String number) {
+    private void askWhetherToAllow(String number) {
         System.out.println("Service is asking whether to allow " + number);
         Intent intent = new Intent();
         intent.setAction(ASK_WHETHER_TO_ALLOW);
         intent.addCategory(Intent.CATEGORY_DEFAULT);
         intent.putExtra(Intent.EXTRA_TEXT, number);
         sendBroadcast(intent);
-        return false;
     }
 
     // Send a text message.
@@ -262,30 +253,24 @@ public class TextService extends Service {
 
         // Try getting the current location.
         mFusedLocationClient.getCurrentLocation(LocationRequest.QUALITY_HIGH_ACCURACY, null)
-                .addOnSuccessListener(new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        System.out.println("Current location gotten");
+                .addOnSuccessListener(location -> {
+                    System.out.println("Current location gotten");
 
-                        // GPS location can be null if GPS is switched off
-                        // or not gotten in reasonable time.
-                        if (location != null) {
-                            appendLog("Got current location.");
-                            onAddressLocated(phoneNumber, location);
-                        }
-                        else {
-                            appendLog("Current location was null.");
-                            replyWithLastLocation(phoneNumber);
-                        }
+                    // GPS location can be null if GPS is switched off
+                    // or not gotten in reasonable time.
+                    if (location != null) {
+                        appendLog("Got current location.");
+                        onAddressLocated(phoneNumber, location);
                     }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        System.out.println("Error trying to get current GPS location");
-                        appendLog("Failed to get current location.");
+                    else {
+                        appendLog("Current location was null.");
                         replyWithLastLocation(phoneNumber);
                     }
+                })
+                .addOnFailureListener(e -> {
+                    System.out.println("Error trying to get current GPS location");
+                    appendLog("Failed to get current location.");
+                    replyWithLastLocation(phoneNumber);
                 });
     }
 
@@ -302,27 +287,21 @@ public class TextService extends Service {
 
         // Get the last (previous known) location.
         mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        System.out.println("Last location gotten");
+                .addOnSuccessListener(location -> {
+                    System.out.println("Last location gotten");
 
-                        // GPS location can be null if GPS is switched off
-                        if (location != null) {
-                            appendLog("Got last location.");
-                            onAddressLocated(phoneNumber, location);
-                        }
-                        else {
-                            appendLog("Last location was null.");
-                        }
+                    // GPS location can be null if GPS is switched off
+                    if (location != null) {
+                        appendLog("Got last location.");
+                        onAddressLocated(phoneNumber, location);
+                    }
+                    else {
+                        appendLog("Last location was null.");
                     }
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        System.out.println("Error trying to get last GPS location");
-                        appendLog("Failed to get last location.");
-                    }
+                .addOnFailureListener(e -> {
+                    System.out.println("Error trying to get last GPS location");
+                    appendLog("Failed to get last location.");
                 });
     }
 
@@ -357,6 +336,7 @@ public class TextService extends Service {
 
             addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
 
+            //noinspection UnnecessaryLocalVariable
             String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
 //        String city = addresses.get(0).getLocality();
 //        String state = addresses.get(0).getAdminArea();
@@ -378,24 +358,6 @@ public class TextService extends Service {
         SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(this);
         return sharedPreferences.getBoolean("include_address_in_reply", false);
-    }
-
-    /**
-     * Give a notification to the user.
-     */
-    private void giveNotification() {
-        String title = "Ping Response Sent";
-        String text = "Current location sent via text.";
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, MainActivity.CHANNEL_ID)
-                .setSmallIcon(R.drawable.message_icon)
-                .setContentTitle(title)
-                .setContentText(text)
-                .setPriority(NotificationCompat.PRIORITY_MAX);
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-
-        // notificationId is a unique int for each notification that you must define
-        int notificationId = 1;
-        notificationManager.notify(notificationId, builder.build());
     }
 
     // Check if service is running.
