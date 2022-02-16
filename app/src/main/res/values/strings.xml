@@ -47,4 +47,5 @@
     <!--    <string name="osm_copyright_text">© &lt;a href="https://www.openstreetmap.org/copyright"&gt;OpenStreetMap&lt;/a&gt; contributors</string>-->
     <string name="button_view_logs_label">View Logs</string>
     <string name="edit_text_logs_hint">Click the button above to view the logs.</string>
+    <string name="restart_service_label">Restart Service</string>
 </resources>

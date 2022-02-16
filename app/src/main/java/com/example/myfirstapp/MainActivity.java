@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             switch (intent.getAction()) {
                 case TextService.BROADCAST_ACTION:
                     updateStatusLabel();
+                    updateStartButtonLabel();
                     notifyIfServiceStopped();
                     break;
                 case TextService.ASK_WHETHER_TO_ALLOW: {
@@ -119,6 +120,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     break;
                 }
             }
+        }
+    }
+
+    /**
+     * Update the start button label, depending on service status.
+     */
+    private void updateStartButtonLabel() {
+        TextView view = findViewById(R.id.buttonStartService);
+        if (TextService.isRunning()) {
+            view.setText(R.string.restart_service_label);
+        }
+        else {
+            view.setText(R.string.start_service_label);
         }
     }
 
