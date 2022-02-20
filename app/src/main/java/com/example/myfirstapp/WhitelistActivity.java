@@ -16,6 +16,7 @@ import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -32,11 +33,25 @@ public class WhitelistActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_ADD_PERMISSION = 2000;
     private static final int CONTACT_PICKER_RESULT = 2001;
 
+    // Intent constants.
+    static final String INTENT_CHOOSE_CONTACT = "INTENT_CHOOSE_CONTACT";
+
+    // Fields.
+    private boolean m_returnContactOnChoose = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_whitelist);
 
+        // Read the intent.
+        Intent intent = getIntent();
+        if (intent.hasExtra(INTENT_CHOOSE_CONTACT)) {
+            // Intent is to choose a contact to ping.
+            m_returnContactOnChoose = true;
+        }
+
+        // Set up the list.
         RecyclerView view = findViewById(R.id.recyclerViewMain);
         view.setLayoutManager(new LinearLayoutManager(this));
         view.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
@@ -128,6 +143,11 @@ public class WhitelistActivity extends AppCompatActivity {
         // Create adapter.
         CustomAdapter adapter = new CustomAdapter(readFromDatabase());
         adapter.setDisplayValues(names);
+
+        // Set callback if required.
+        if (m_returnContactOnChoose) {
+            adapter.setSelectionNotifier(this::onContactToReturnSelected);
+        }
 
         // Update list view.
         listView.setAdapter(adapter);
@@ -222,5 +242,44 @@ public class WhitelistActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onRecyclerViewMainClick(View view) {
+        Log.i("Ping", "Recycler view clicked.");
+
+        if (m_returnContactOnChoose) {
+            RecyclerView listView = findViewById(R.id.recyclerViewMain);
+            CustomAdapter adapter = (CustomAdapter) listView.getAdapter();
+
+            assert adapter != null;
+            if (adapter.isItemSelected()) {
+                String phoneNumber = adapter.getSelectedValue();
+                Log.i("Ping", "Number chosen:" + phoneNumber);
+            }
+        }
+    }
+
+    /**
+     * Callback for when a contact is selected.
+     */
+    private void onContactToReturnSelected() {
+        RecyclerView listView = findViewById(R.id.recyclerViewMain);
+        CustomAdapter adapter = (CustomAdapter) listView.getAdapter();
+
+        assert adapter != null;
+        if (adapter.isItemSelected()) {
+            // Get the contact details.
+            String phoneNumber = adapter.getSelectedValue();
+
+            // Create the intent.
+            Intent data = new Intent();
+
+            // Set the data to pass back.
+            data.setData(Uri.parse(phoneNumber));
+            setResult(RESULT_OK, data);
+
+            // Close the activity.
+            finish();
+        }
     }
 }

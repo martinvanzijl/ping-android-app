@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final SimpleDateFormat SHORT_TIMESTAMP_FORMAT =
             new SimpleDateFormat("hh:mm aa");
     private ActivityResultLauncher<Intent> chooseContactActivity = null;
+    private ActivityResultLauncher<Intent> chooseContactFromWhitelistActivity = null;
     private SharedPreferences.OnSharedPreferenceChangeListener prefListener = null;
     private PingDbHelper dbHelper = null;
 
@@ -398,6 +399,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
         );
 
+        chooseContactFromWhitelistActivity = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                    // Get the returned data.
+                    Intent intent = result.getData();
+                    assert intent != null;
+
+                    // Send the ping request.
+                    String phoneNumber = intent.getDataString();
+                    sendPingRequest(phoneNumber);
+                }
+            }
+        );
+
         // Create preference listener.
         prefListener = (preferences, key) -> {
             Log.i("Preferences", "Settings key changed: " + key);
@@ -690,9 +706,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // Choose a phone to ping.
     private void chooseContactToPing() {
-        Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
-                Contacts.CONTENT_URI);
-        chooseContactActivity.launch(contactPickerIntent);
+        boolean chooseFromPingContacts = choosePingContactFromWhitelistEnabled();
+        if (chooseFromPingContacts) {
+            Intent contactPickerIntent = new Intent(this, WhitelistActivity.class);
+            contactPickerIntent.putExtra(WhitelistActivity.INTENT_CHOOSE_CONTACT, true);
+            chooseContactFromWhitelistActivity.launch(contactPickerIntent);
+        }
+        else {
+            Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
+                    Contacts.CONTENT_URI);
+            chooseContactActivity.launch(contactPickerIntent);
+        }
+    }
+
+    /**
+     * Check whether to choose ping contact from the whitelist screen.
+     * @return The preference value.
+     */
+    private boolean choosePingContactFromWhitelistEnabled() {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPreferences.getBoolean("choose_ping_contact_from_whitelist", false);
     }
 
     public void onPingButtonClick(View view) {

@@ -33,6 +33,11 @@
             android:defaultValue="false"
             android:key="ignore_unlisted_contacts"
             android:title="Ignore ping requests from non-whitelisted contacts" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="choose_ping_contact_from_whitelist"
+            android:title="Choose ping contact from whitelist" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Service">
 

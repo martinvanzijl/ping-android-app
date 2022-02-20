@@ -1,6 +1,7 @@
 package com.example.myfirstapp;
 
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     private List<String> displayValues = null;
     private int selectedPos = RecyclerView.NO_POSITION;
     private View selectedView = null;
+    private SelectionNotifier selectionNotifier = null;
 
     public CustomAdapter (List<String> data){
         this.data = data;
@@ -71,6 +73,14 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         return this.data.get(selectedPos);
     }
 
+    /**
+     * Set the callback for when an item is selected.
+     * @param notifier The callback.
+     */
+    public void setSelectionNotifier(SelectionNotifier notifier) {
+        selectionNotifier = notifier;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView textView;
 
@@ -91,6 +101,11 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
             selectedPos = getLayoutPosition();
             view.setBackgroundColor(Color.CYAN);
             selectedView = view;
+
+            // Call the callback if required.
+            if (selectionNotifier != null) {
+                selectionNotifier.onItemSelected();
+            }
         }
     }
 }
