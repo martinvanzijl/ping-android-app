@@ -18,7 +18,12 @@
         android:title="@string/action_location_history"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_help"
+        android:id="@+id/action_scheduled_ping"
         android:orderInCategory="103"
+        android:title="@string/action_scheduled_ping"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_help"
+        android:orderInCategory="104"
         android:title="@string/action_help" />
 </menu>

@@ -49,4 +49,35 @@
     <string name="edit_text_logs_hint">Click the button above to view the logs.</string>
     <string name="restart_service_label">Restart Service</string>
     <string name="expand_or_collapse_map">Expand or collapse map.</string>
+    <string name="action_scheduled_ping">Scheduled Pings</string>
+    <string name="title_activity_scheduled_ping">Scheduled Pings</string>
+    <!-- Strings for timer. -->
+    <string name="timer_line_1">Send a ping request to:</string>
+    <string name="schedule_contact_label_default"><![CDATA[<Click the button to choose a contact>]]></string>
+    <string name="schedule_button_choose_contact">Choose Contact</string>
+    <string name="schedule_label_every">Every</string>
+    <string name="label_schedule_interval_suffix">H/M/S</string>
+    <string name="button_schedule_save_label">Start</string>
+    <string name="hour_separator">:</string>
+    <string name="schedule_start_hour_description">Choose the starting hour.</string>
+    <string name="schedule_start_minute_description">Choose the starting minute.</string>
+    <string name="schedule_start_am_description">Choose start AM or PM.</string>
+    <string name="label_schedule_until">Until:</string>
+    <string name="choose_hour_description">Choose the hour.</string>
+    <string name="choose_minute_description">Choose the minute.</string>
+    <string name="choose_am">Choose AM or PM.</string>
+    <string name="schedule_end_hour_description">Choose the end hour.</string>
+    <string name="schedule_end_minute_description">Choose the end minute.</string>
+    <string name="schedule_end_am_description">Choose the end time AM or PM.</string>
+    <string name="button_stop_label">Stop</string>
+    <string name="label_hint">Press \"Start\" to send scheduled ping requests.</string>
+    <string name="label_ping_sent">Ping request sent at %1$s.</string>
+    <string name="label_stopped">Stopped.</string>
+    <string name="label_running">Running.</string>
+    <string name="label_running_but_no_ping_sent_yet" />
+    <string name="label_schedule_from">From:</string>
+    <string name="label_time_left">Running. Next ping request in %1$s…</string>
+    <string name="label_send_ping_to">Send a ping request to: %1$s</string>
+    <string name="log_text_view_hint">The logs will show here.</string>
+<!--    <string name="button_clear_label">Clear</string>-->
 </resources>

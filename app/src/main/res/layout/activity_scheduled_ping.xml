@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ScheduledPingActivity">
+
+    <LinearLayout
+        android:id="@+id/linearLayoutMain"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textViewScheduleSendTo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/timer_line_1"
+            tools:layout_editor_absoluteY="18dp" />
+
+        <Button
+            android:id="@+id/buttonScheduleChooseContact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/schedule_button_choose_contact" />
+
+        <LinearLayout
+            android:id="@+id/linearLayoutFrequency"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textViewScheduleEvery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/schedule_label_every" />
+
+            <Spinner
+                android:id="@+id/spinnerScheduleHours"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:entries="@array/schedule_hour_entries"
+                android:dropDownWidth="75dp"
+                android:minHeight="48dp" />
+
+            <TextView
+                android:id="@+id/textViewIntervalHourSeperator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="9dp"
+                android:text="@string/hour_separator" />
+
+            <Spinner
+                android:id="@+id/spinnerScheduleMinutes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:entries="@array/time_minutes_array"
+                android:dropDownWidth="75dp"
+                android:minHeight="48dp" />
+
+            <TextView
+                android:id="@+id/textViewIntervalMinutesSeperator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="9dp"
+                android:text="@string/hour_separator" />
+
+            <Spinner
+                android:id="@+id/spinnerScheduleSeconds"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:entries="@array/time_seconds_array"
+                android:dropDownWidth="75dp"
+                android:minHeight="48dp" />
+
+            <TextView
+                android:id="@+id/textViewScheduleInvervalSuffix"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/label_schedule_interval_suffix"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/linearLayoutFrom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchScheduleFrom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:textColor="#757575"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="DuplicateSpeakableTextCheck"
+                tools:layout_conversion_absoluteHeight="48dp"
+                tools:layout_conversion_absoluteWidth="54dp" />
+
+            <TextView
+                android:id="@+id/textViewScheduleFrom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/label_schedule_from"
+                app:layout_constraintBaseline_toBaselineOf="@id/switchScheduleFrom"
+                app:layout_constraintStart_toEndOf="@+id/switchScheduleFrom"
+                tools:layout_conversion_absoluteHeight="19dp"
+                tools:layout_conversion_absoluteWidth="32dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayoutStartTime"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <Spinner
+                android:id="@+id/spinnerScheduleStartHour"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/schedule_start_hour_description"
+                android:dropDownWidth="75dp"
+                android:entries="@array/time_hours_array"
+                android:minHeight="48dp" />
+
+            <TextView
+                android:id="@+id/textViewHourSeperator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="9dp"
+                android:text="@string/hour_separator" />
+
+            <Spinner
+                android:id="@+id/spinnerScheduleStartMinute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/schedule_start_minute_description"
+                android:dropDownWidth="75dp"
+                android:entries="@array/time_minutes_array"
+                android:layout_marginStart="9dp"
+                android:minHeight="48dp" />
+
+            <Spinner
+                android:id="@+id/spinnerScheduleStartAM"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/schedule_start_am_description"
+                android:dropDownWidth="75dp"
+                android:entries="@array/time_am_array"
+                android:layout_marginStart="9dp"
+                android:minHeight="48dp" />
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/linearLayoutUntil"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchScheduleUntil"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:textColor="#757575"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:layout_conversion_absoluteHeight="48dp"
+                tools:layout_conversion_absoluteWidth="54dp" />
+
+            <TextView
+                android:id="@+id/textViewScheduleUntil"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/label_schedule_until"
+                app:layout_constraintBaseline_toBaselineOf="@id/switchScheduleUntil"
+                app:layout_constraintStart_toEndOf="@+id/switchScheduleUntil"
+                tools:layout_conversion_absoluteHeight="19dp"
+                tools:layout_conversion_absoluteWidth="32dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayoutEndTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <Spinner
+                android:id="@+id/spinnerScheduleEndHour"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:contentDescription="@string/schedule_end_hour_description"
+                android:dropDownWidth="75dp"
+                android:entries="@array/time_hours_array"
+                android:minHeight="48dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewScheduleMinutes" />
+
+            <TextView
+                android:id="@+id/textViewEndSeperator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="9dp"
+                android:layout_weight="1"
+                android:text="@string/hour_separator"
+                app:layout_constraintBaseline_toBaselineOf="@id/spinnerScheduleEndHour"
+                app:layout_constraintStart_toEndOf="@+id/spinnerScheduleStartHour" />
+
+            <Spinner
+                android:id="@+id/spinnerScheduleEndMinute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="9dp"
+                android:layout_weight="1"
+                android:contentDescription="@string/schedule_end_minute_description"
+                android:dropDownWidth="75dp"
+                android:entries="@array/time_minutes_array"
+                android:minHeight="48dp"
+                app:layout_constraintStart_toEndOf="@+id/textViewHourSeperator"
+                app:layout_constraintTop_toBottomOf="@+id/textViewScheduleMinutes" />
+
+            <Spinner
+                android:id="@+id/spinnerScheduleEndAM"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="9dp"
+                android:layout_weight="1"
+                android:contentDescription="@string/schedule_end_am_description"
+                android:dropDownWidth="75dp"
+                android:entries="@array/time_am_array"
+                android:minHeight="48dp"
+                app:layout_constraintStart_toEndOf="@+id/spinnerScheduleStartMinute"
+                app:layout_constraintTop_toBottomOf="@+id/textViewScheduleMinutes" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textViewStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/label_hint" />
+
+        <TextView
+            android:id="@+id/textViewRunning"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="16dp"
+            android:layout_weight="1"
+            android:text="@string/label_stopped" />
+
+        <LinearLayout
+            android:id="@+id/linearLayoutButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/buttonScheduleSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:text="@string/button_schedule_save_label"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:ignore="ButtonStyle" />
+
+            <Button
+                android:id="@+id/buttonScheduleStop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/button_stop_label"
+                tools:ignore="ButtonStyle" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

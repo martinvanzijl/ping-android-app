@@ -20,8 +20,6 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
 import android.telephony.SmsManager;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -54,11 +52,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.OverlayItem;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -117,7 +112,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     double longitude = intent.getDoubleExtra(TextService.PING_RESPONSE_LONGITUDE, 0);
                     String phoneNumber = intent.getStringExtra(TextService.PING_RESPONSE_CONTACT_NAME);
                     String address = intent.getStringExtra(TextService.PING_RESPONSE_ADDRESS);
-                    placeMapMarker(phoneNumber, latitude, longitude, address);
+                    try {
+                        placeMapMarker(phoneNumber, latitude, longitude, address);
+                    } catch (Exception e) {
+                        Logger.appendLog(getApplicationContext(),
+                                "Could not place map marker: " + e.getLocalizedMessage());
+                    }
                     break;
                 }
             }
@@ -860,6 +860,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             startActivity(intent);
             return true;
         }
+        else if (id == R.id.action_scheduled_ping) {
+            Intent intent = new Intent(this, ScheduledPingActivity.class);
+            startActivity(intent);
+            return true;
+        }
         else if (id == R.id.action_help) {
             Intent intent = new Intent(this, HelpActivity.class);
             startActivity(intent);
@@ -922,6 +927,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         Intent intent = new Intent(MainActivity.this, TextService.class);
         stopService(intent);
+
+        // Stop the "scheduled ping" service.
+        stopService(new Intent(this, BroadcastService.class));
     }
 
     private void requestPermissionsIfNecessary(String[] permissions) {
