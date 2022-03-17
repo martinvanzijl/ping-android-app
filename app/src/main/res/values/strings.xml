@@ -48,4 +48,5 @@
     <string name="button_view_logs_label">View Logs</string>
     <string name="edit_text_logs_hint">Click the button above to view the logs.</string>
     <string name="restart_service_label">Restart Service</string>
+    <string name="expand_or_collapse_map">Expand or collapse map.</string>
 </resources>

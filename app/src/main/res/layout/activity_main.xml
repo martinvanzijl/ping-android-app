@@ -105,6 +105,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:clickable="true"
+        android:contentDescription="@string/expand_or_collapse_map"
         android:onClick="onExpandMapClick"
         app:layout_constraintEnd_toEndOf="@+id/map"
         app:layout_constraintTop_toTopOf="@+id/map"
