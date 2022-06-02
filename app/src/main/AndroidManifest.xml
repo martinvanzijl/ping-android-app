@@ -24,6 +24,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyFirstApp">
         <activity
+            android:name=".ScheduledPingActivity"
+            android:exported="true"
+            android:label="@string/title_activity_scheduled_ping" />
+        <activity
             android:name=".LocationHistoryActivity"
             android:exported="true"
             android:label="@string/title_activity_location_history" />
@@ -53,6 +57,11 @@
 
         <service
             android:name=".TextService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <service
+            android:name=".BroadcastService"
             android:enabled="true"
             android:exported="false" />
 
