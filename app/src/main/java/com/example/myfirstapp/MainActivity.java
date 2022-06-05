@@ -283,9 +283,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         System.out.println("Asking whether to allow " + phoneNumber);
 
+        // Get contact name.
+        String contactName = getContactName(phoneNumber, this);
+
+        // Build the dialog.
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Confirm");
-        builder.setMessage("Allow ping request from " + phoneNumber + "?");
+        builder.setMessage("Allow ping request from " + contactName + "?");
 
         // Add the buttons
         builder.setPositiveButton("Yes", (dialog, id) -> {
