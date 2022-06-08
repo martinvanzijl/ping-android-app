@@ -35,10 +35,10 @@
             android:name=".HelpActivity"
             android:exported="true"
             android:label="@string/action_help" />
-        <activity
-            android:name=".LoggingActivity"
-            android:exported="true"
-            android:label="@string/title_activity_logging" />
+<!--        <activity-->
+<!--            android:name=".LoggingActivity"-->
+<!--            android:exported="true"-->
+<!--            android:label="@string/title_activity_logging" />-->
         <activity
             android:name=".SettingsActivity"
             android:exported="true"

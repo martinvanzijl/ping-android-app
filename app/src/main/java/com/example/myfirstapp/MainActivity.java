@@ -854,11 +854,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             startActivity(intent);
             return true;
         }
-        else if (id == R.id.action_logging) {
-            Intent intent = new Intent(this, LoggingActivity.class);
-            startActivity(intent);
-            return true;
-        }
+//        else if (id == R.id.action_logging) {
+//            Intent intent = new Intent(this, LoggingActivity.class);
+//            startActivity(intent);
+//            return true;
+//        }
         else if (id == R.id.action_location_history) {
             Intent intent = new Intent(this, LocationHistoryActivity.class);
             startActivity(intent);
