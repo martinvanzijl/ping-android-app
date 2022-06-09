@@ -18,8 +18,8 @@ import java.util.List;
 
 public class Logger {
 
-    // Hack in case logging to files does not work.
-    private static List<String> m_logsString = new ArrayList<>();
+//    // Hack in case logging to files does not work.
+//    private static List<String> m_logsString = new ArrayList<>();
 
     // Check if logging is enabled.
     private static boolean loggingEnabled(Context context) {
@@ -49,8 +49,8 @@ public class Logger {
         // Format the message.
         String message = timestamp + ": " + text;
 
-        // Hack: Log internally.
-        m_logsString.add(message);
+//        // Hack: Log internally.
+//        m_logsString.add(message);
 
         // Write message to log file.
         try {
@@ -94,16 +94,16 @@ public class Logger {
         return logDir;
     }
 
-    // Return the logs as a string.
-    public static String getLogsAsString() {
-        if (m_logsString.isEmpty()) {
-            return "Nothing has been logged yet.";
-        }
-
-        StringBuilder builder = new StringBuilder();
-        for (String message: m_logsString) {
-            builder.append(message).append("\n");
-        }
-        return builder.toString();
-    }
+//    // Return the logs as a string.
+//    public static String getLogsAsString() {
+//        if (m_logsString.isEmpty()) {
+//            return "Nothing has been logged yet.";
+//        }
+//
+//        StringBuilder builder = new StringBuilder();
+//        for (String message: m_logsString) {
+//            builder.append(message).append("\n");
+//        }
+//        return builder.toString();
+//    }
 }

@@ -65,6 +65,6 @@ public class LoggingActivity extends AppCompatActivity {
 
     public void onViewLogsClick(View view) {
         EditText field = findViewById(R.id.editTextLogs);
-        field.setText(Logger.getLogsAsString());
+//        field.setText(Logger.getLogsAsString());
     }
 }
