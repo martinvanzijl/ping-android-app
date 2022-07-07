@@ -1,26 +1,22 @@
 package com.martinvz.ping;
 
 import android.Manifest;
+import android.app.Notification;
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationRequest;
-import android.os.Build;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.telephony.SmsManager;
-import android.telephony.SmsMessage;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -48,12 +44,10 @@ public class TextService extends Service {
     public static final String PING_RESPONSE_CONTACT_NAME = "PING_RESPONSE_CONTACT_NAME";
     public static final String COMMAND_SEND_PING_RESPONSE = "COMMAND_SEND_PING_RESPONSE";
     public static final String INTENT_EXTRA_NUMBER = "INTENT_EXTRA_NUMBER";
+    private static final int FOREGROUND_SERVICE_ID = 2001;
 
     // Hack to let activity know about status.
     private static boolean m_isRunning = false;
-
-    // Receiver object for text messages.
-    final SmsReceiver smsReceiver = new SmsReceiver();
 
     // Source for cancellation tokens.
     private final CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -67,7 +61,7 @@ public class TextService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Be notified when texts are received.
-        registerReceiver(smsReceiver, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
+//        registerReceiver(smsReceiver, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
 
         // Check whether to stop to service.
         String action = intent.getAction();
@@ -76,6 +70,16 @@ public class TextService extends Service {
             m_isRunning = false;
         } else {
             m_isRunning = true;
+
+            // Run the service in the foreground, using a "sticky" notification.
+            Notification notification = new NotificationCompat.Builder(this, MainActivity.CHANNEL_ID)
+                    .setContentTitle("Ping Service")
+                    .setContentText("The Ping service is running.")
+                    .setSmallIcon(R.drawable.message_icon)
+                    .build();
+            startForeground(FOREGROUND_SERVICE_ID, notification);
+
+            SmsReceiver.setService(this);
         }
 
         // Check whether to send response.
@@ -95,16 +99,9 @@ public class TextService extends Service {
 
     @Override
     public void onDestroy() {
-        try {
-            unregisterReceiver(smsReceiver);
-        }
-        catch (IllegalArgumentException e) {
-            Log.w("Ping", "Receiver not registered, so cannot unregister.");
-        }
-
         m_isRunning = false;
         broadcastStatusChange();
-
+        SmsReceiver.setService(null);
         appendLog("Service destroyed.");
     }
 
@@ -116,66 +113,12 @@ public class TextService extends Service {
         sendBroadcast(intent);
     }
 
-    // Class that receives text messages.
-    private class SmsReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            appendLog("Text message received.");
-
-            String number = "";
-            StringBuilder body = new StringBuilder();
-
-            Bundle extras = intent.getExtras();
-
-            if (extras != null) {
-                Object[] pdus = (Object[]) extras.get("pdus");
-                if (pdus != null) {
-
-                    // Get the message details.
-                    for (Object pdu : pdus) {
-                        SmsMessage smsMessage = getIncomingMessage(pdu, extras);
-                        body.append(smsMessage.getDisplayMessageBody());
-                        number = smsMessage.getOriginatingAddress();
-                    }
-
-                    // Send a reply.
-                    String text = body.toString();
-                    if (text.equals(MainActivity.PING_REQUEST_TEXT)) {
-                        if (checkIfAllowed(number)) {
-                            sendPingReply(number);
-                            System.out.println("Ping reply sent to " + number);
-                        } else {
-                            System.out.println("Ping request from " + number + " ignored.");
-                        }
-                    }
-                    else if(text.startsWith(MainActivity.PING_REPLY_START)){
-                        processPingResponse(text, number);
-                    }
-                }
-            }
-        }
-
-        // Get the text message from the raw object.
-        private SmsMessage getIncomingMessage(Object object, Bundle bundle) {
-            SmsMessage smsMessage;
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                String format = bundle.getString("format");
-                smsMessage = SmsMessage.createFromPdu((byte[]) object, format);
-            } else {
-                smsMessage = SmsMessage.createFromPdu((byte[]) object);
-            }
-
-            return smsMessage;
-        }
-    }
-
     // Write a message to the log file.
-    private void appendLog(String message) {
+    void appendLog(String message) {
         Logger.appendLog(getApplicationContext(), message);
     }
 
-    private void processPingResponse(String text, String phoneNumber) {
+    void processPingResponse(String text, String phoneNumber) {
         try {
             double latitude = 0;
             double longitude = 0;
@@ -210,7 +153,7 @@ public class TextService extends Service {
     }
 
     // Check if ping request is allowed from number.
-    private boolean checkIfAllowed(String number) {
+    boolean checkIfAllowed(String number) {
         PingDbHelper database = new PingDbHelper(this);
         if (database.whitelistContactExists(number)) {
             return true;
@@ -243,7 +186,7 @@ public class TextService extends Service {
     }
 
     // Send a ping reply to the given number.
-    private void sendPingReply(String phoneNumber) {
+    void sendPingReply(String phoneNumber) {
         appendLog("Trying to send ping reply.");
 
         // Get the location provider.
