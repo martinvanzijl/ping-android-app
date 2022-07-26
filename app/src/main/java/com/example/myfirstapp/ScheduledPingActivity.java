@@ -21,12 +21,12 @@ import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -87,6 +87,8 @@ public class ScheduledPingActivity extends AppCompatActivity {
                 // Stopped.
                 TextView textView = findViewById(R.id.textViewRunning);
                 textView.setText(R.string.label_stopped);
+                Button button = findViewById(R.id.buttonScheduleSave);
+                button.setText(R.string.button_schedule_start_label);
             }
             else {
                 // Interval update.
@@ -527,6 +529,9 @@ public class ScheduledPingActivity extends AppCompatActivity {
         TextView textView = findViewById(R.id.textViewRunning);
         textView.setText(R.string.label_running);
 
+        Button button = findViewById(R.id.buttonScheduleSave);
+        button.setText(R.string.button_schedule_restart_label);
+
         if (intervalBeforeStart > 0) {
             TextView textViewStatus = findViewById(R.id.textViewStatus);
             textViewStatus.setText(getString(R.string.label_running_but_no_ping_sent_yet));
@@ -555,6 +560,9 @@ public class ScheduledPingActivity extends AppCompatActivity {
         // Update labels.
         TextView textView = findViewById(R.id.textViewRunning);
         textView.setText(R.string.label_stopped);
+
+        Button button = findViewById(R.id.buttonScheduleSave);
+        button.setText(R.string.button_schedule_start_label);
     }
 
     /**

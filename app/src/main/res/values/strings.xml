@@ -57,7 +57,8 @@
     <string name="schedule_button_choose_contact">Choose Contact</string>
     <string name="schedule_label_every">Every</string>
     <string name="label_schedule_interval_suffix">H/M/S</string>
-    <string name="button_schedule_save_label">Start</string>
+    <string name="button_schedule_start_label">Start</string>
+    <string name="button_schedule_restart_label">Restart</string>
     <string name="hour_separator">:</string>
     <string name="schedule_start_hour_description">Choose the starting hour.</string>
     <string name="schedule_start_minute_description">Choose the starting minute.</string>
