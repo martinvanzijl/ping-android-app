@@ -288,7 +288,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                android:text="@string/button_schedule_save_label"
+                android:text="@string/button_schedule_start_label"
                 app:layout_constraintStart_toStartOf="parent"
                 tools:ignore="ButtonStyle" />
 
