@@ -173,6 +173,10 @@ public class ScheduledPingActivity extends AppCompatActivity {
                 String timeStamp = getShortTimestamp(date);
                 view.setText(getString(R.string.label_ping_sent, timeStamp));
             }
+
+            // "Start" button.
+            Button button = findViewById(R.id.buttonScheduleSave);
+            button.setText(R.string.button_schedule_restart_label);
         }
     }
 
