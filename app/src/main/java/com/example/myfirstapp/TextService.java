@@ -297,12 +297,19 @@ public class TextService extends Service {
                     }
                     else {
                         appendLog("Last location was null.");
+                        replyLocationUnavailable(phoneNumber);
                     }
                 })
                 .addOnFailureListener(e -> {
                     System.out.println("Error trying to get last GPS location");
                     appendLog("Failed to get last location.");
                 });
+    }
+
+    // Reply to notify that the location data is not available.
+    private void replyLocationUnavailable(String phoneNumber) {
+        String message = "Location data not available.";
+        sendText(phoneNumber, message);
     }
 
     // Callback for when address is located for the ping reply.
