@@ -56,7 +56,7 @@ public class Logger {
         try {
             // Get the file name.
             File dir = getLogFileDir();
-            String fileName = dir + "/log.txt";
+            String fileName = dir + "/ping-log.txt";
             File logFile = new File(fileName);
 
             // Create log file if it does not exist.
