@@ -30,6 +30,14 @@ public class Logger {
         return enabled;
     }
 
+    // Timestamp formatter.
+    private static SimpleDateFormat m_dateTimestampFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+    // Get date timestamp.
+    private static String getDateTimestamp(Date date) {
+        return m_dateTimestampFormat.format(date);
+    }
+
     // Write a message to the log file.
     public static void appendLog(Context context, String text)
     {
@@ -56,7 +64,7 @@ public class Logger {
         try {
             // Get the file name.
             File dir = getLogFileDir();
-            String fileName = dir + "/ping-log.txt";
+            String fileName = dir + "/ping-log-" + getDateTimestamp(date) + ".txt";
             File logFile = new File(fileName);
 
             // Create log file if it does not exist.
