@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -15,6 +16,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
@@ -46,6 +48,7 @@ public class ScheduledPingActivity extends AppCompatActivity {
 
     // Fields.
     private ActivityResultLauncher<Intent> chooseContactActivity = null;
+    private ActivityResultLauncher<Intent> chooseContactFromWhitelistActivity = null;
     private String m_contactNumber = "";
     private final BroadcastReceiver br = new BroadcastReceiver() {
         @Override
@@ -137,6 +140,23 @@ public class ScheduledPingActivity extends AppCompatActivity {
                         Intent data = result.getData();
                         assert data != null;
                         setContact(data);
+                    }
+                }
+        );
+
+        // Create result handler for "white-list" activity.
+        chooseContactFromWhitelistActivity = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
+                        // Get the returned data.
+                        Intent intent = result.getData();
+                        assert intent != null;
+
+                        // Set the contact.
+                        m_contactNumber = intent.getDataString();
+                        String contactName = MainActivity.getContactName(m_contactNumber, this);
+                        updateContactLabel(contactName);
                     }
                 }
         );
@@ -374,15 +394,36 @@ public class ScheduledPingActivity extends AppCompatActivity {
     }
 
     /**
+     * Check whether to choose ping contact from the whitelist screen.
+     * @return The preference value.
+     */
+    private boolean choosePingContactFromWhitelistEnabled() {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPreferences.getBoolean("choose_ping_contact_from_whitelist", false);
+    }
+
+    /**
      * Choose contact to send scheduled Ping request to.
      */
     private void chooseFilterContact() {
-        // Create intent.
-        Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
-                ContactsContract.Contacts.CONTENT_URI);
+        // Check preference.
+        boolean chooseFromPingContacts = choosePingContactFromWhitelistEnabled();
 
-        // Start activity.
-        chooseContactActivity.launch(contactPickerIntent);
+        if (chooseFromPingContacts) {
+            // Use "white-list" activity.
+            Intent contactPickerIntent = new Intent(this, WhitelistActivity.class);
+            contactPickerIntent.putExtra(WhitelistActivity.INTENT_CHOOSE_CONTACT, true);
+            chooseContactFromWhitelistActivity.launch(contactPickerIntent);
+        }
+        else {
+            // Create intent.
+            Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
+                    ContactsContract.Contacts.CONTENT_URI);
+
+            // Start activity.
+            chooseContactActivity.launch(contactPickerIntent);
+        }
     }
 
     private int getHourIn12HourTime(int hour) {
