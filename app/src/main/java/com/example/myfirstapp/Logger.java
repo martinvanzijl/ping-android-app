@@ -87,7 +87,7 @@ public class Logger {
     // Return the directory for storing log files.
     public static File getLogFileDir() throws IOException {
         File documentsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-        File logDir = new File(documentsDir + File.separator + "log-files");
+        File logDir = new File(documentsDir + File.separator + "ping-log-files");
 
         if (!logDir.exists()) {
             Log.i("Log Files", "Creating logs directory");
