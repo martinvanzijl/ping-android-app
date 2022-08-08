@@ -1,7 +1,6 @@
 package com.example.myfirstapp;
 
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 // An adapter for the list view to display Ping contacts. This contains a set
 // of values and optional display text.
@@ -28,6 +29,27 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     // Set the display values to use. This must have a value for each entry.
     public void setDisplayValues(List<String> displayValues) {
         this.displayValues = displayValues;
+    }
+
+    // Sort the list in alphabetical order.
+    // @pre The display values must already be set.
+    public void sortEntries() {
+        // Create a sorted map.
+        SortedMap<String, String> map = new TreeMap<>();
+
+        // Add entries.
+        for (int i = 0; i < data.size(); ++i) {
+            String displayText = getDisplayText(i);
+            String value = data.get(i);
+            map.put(displayText, value);
+        }
+
+        // Update the lists.
+        data.clear();
+        data.addAll(map.values());
+
+        displayValues.clear();
+        displayValues.addAll(map.keySet());
     }
 
     @NonNull
