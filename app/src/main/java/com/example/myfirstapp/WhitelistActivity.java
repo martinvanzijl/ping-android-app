@@ -143,6 +143,7 @@ public class WhitelistActivity extends AppCompatActivity {
         // Create adapter.
         CustomAdapter adapter = new CustomAdapter(readFromDatabase());
         adapter.setDisplayValues(names);
+        adapter.sortEntries();
 
         // Set callback if required.
         if (m_returnContactOnChoose) {
