@@ -109,7 +109,8 @@
         android:onClick="onExpandMapClick"
         app:layout_constraintEnd_toEndOf="@+id/map"
         app:layout_constraintTop_toTopOf="@+id/map"
-        app:srcCompat="@drawable/expand_white" />
+        app:srcCompat="@drawable/expand_white"
+        android:focusable="true" />
 
     <TextView
         android:id="@+id/textViewOSMCopyright"
