@@ -83,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             new SimpleDateFormat("hh:mm aa");
     private ActivityResultLauncher<Intent> chooseContactActivity = null;
     private ActivityResultLauncher<Intent> chooseContactFromWhitelistActivity = null;
-    private SharedPreferences.OnSharedPreferenceChangeListener prefListener = null;
     private PingDbHelper dbHelper = null;
 
     @Override
@@ -419,7 +418,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         );
 
         // Create preference listener.
-        prefListener = (preferences, key) -> {
+        SharedPreferences.OnSharedPreferenceChangeListener prefListener = (preferences, key) -> {
             Log.i("Preferences", "Settings key changed: " + key);
 
             // Handle location history preference change.
@@ -428,12 +427,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 boolean showHistoricMarkers = showLocationHistoryEnabled();
 
                 // Show or hide historic markers.
-                for (MarkerProxy marker: mHistoricMarkers) {
+                for (MarkerProxy marker : mHistoricMarkers) {
                     marker.setVisible(showHistoricMarkers);
                 }
 
                 // Always show latest.
-                for (MarkerProxy marker: mLatestMarkers.values()) {
+                for (MarkerProxy marker : mLatestMarkers.values()) {
                     marker.setVisible(true);
                 }
             }
