@@ -16,7 +16,7 @@ import java.util.TreeMap;
 // An adapter for the list view to display Ping contacts. This contains a set
 // of values and optional display text.
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
-    private List<String> data;
+    private final List<String> data;
     private List<String> displayValues = null;
     private int selectedPos = RecyclerView.NO_POSITION;
     private View selectedView = null;
@@ -104,7 +104,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private TextView textView;
+        private final TextView textView;
 
         public ViewHolder(View view) {
             super(view);
