@@ -95,6 +95,7 @@ public class WhitelistActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressWarnings("SameParameterValue")
     private boolean checkForPermission(String permission) {
         if (ContextCompat.checkSelfPermission(
                 getApplicationContext(), permission) ==

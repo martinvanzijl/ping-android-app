@@ -68,6 +68,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     // Check if a single permission is granted.
+    @SuppressWarnings("SameParameterValue")
     private boolean checkForPermission(String permission, int requestCode) {
         if (ContextCompat.checkSelfPermission(
                 getApplicationContext(), permission) ==

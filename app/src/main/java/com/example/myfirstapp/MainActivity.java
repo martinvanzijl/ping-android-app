@@ -448,6 +448,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Show a "toast" message.
      * @param message The message.
      */
+    @SuppressWarnings("SameParameterValue")
     protected void showToastMessage(String message) {
         Context context = getApplicationContext();
         int duration = Toast.LENGTH_SHORT;
