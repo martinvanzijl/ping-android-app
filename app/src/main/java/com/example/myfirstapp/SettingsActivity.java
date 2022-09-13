@@ -45,19 +45,17 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
-            SwitchPreferenceCompat preference = findPreference("enable_logging");
-            preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                public boolean onPreferenceClick(Preference preference) {
+            SwitchPreferenceCompat loggingPreference = findPreference("enable_logging");
+            loggingPreference.setOnPreferenceClickListener(preference -> {
 //                    Log.i("Logging", "Preference clicked.");
-                    SwitchPreferenceCompat switchPreference = (SwitchPreferenceCompat) preference;
-                    if (switchPreference.isChecked()) {
+                SwitchPreferenceCompat switchPreference = (SwitchPreferenceCompat) preference;
+                if (switchPreference.isChecked()) {
 //                        Log.i("Logging", "Switch is checked.");
-                        if (m_instance != null) {
-                            m_instance.checkWriteFilePermissions();
-                        }
+                    if (m_instance != null) {
+                        m_instance.checkWriteFilePermissions();
                     }
-                    return true;
                 }
+                return true;
             });
         }
     }
