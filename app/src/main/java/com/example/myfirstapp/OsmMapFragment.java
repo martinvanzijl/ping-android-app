@@ -34,8 +34,7 @@ public class OsmMapFragment extends Fragment {
      * @return A new instance of fragment OsmMapFragment.
      */
     public static OsmMapFragment newInstance() {
-        OsmMapFragment fragment = new OsmMapFragment();
-        return fragment;
+        return new OsmMapFragment();
     }
 
     @Override

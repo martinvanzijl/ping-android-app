@@ -84,6 +84,7 @@ public class PingDbHelper extends SQLiteOpenHelper {
                 PingDatabaseContract.WhitelistContactEntry.COLUMN_NAME_PHONE_NUMBER
         };
 
+        @SuppressWarnings("UnnecessaryLocalVariable")
         Cursor cursor = db.query(
                 PingDatabaseContract.WhitelistContactEntry.TABLE_NAME, // The table to query
                 projection, // The array of columns to return (pass null to get all)
@@ -192,6 +193,7 @@ public class PingDbHelper extends SQLiteOpenHelper {
                 PingDatabaseContract.LocationHistoryEntry.COLUMN_NAME_CONTACT_NAME
         };
 
+        @SuppressWarnings("UnnecessaryLocalVariable")
         Cursor cursor = db.query(
                 PingDatabaseContract.LocationHistoryEntry.TABLE_NAME, // The table to query
                 projection, // The array of columns to return (pass null to get all)

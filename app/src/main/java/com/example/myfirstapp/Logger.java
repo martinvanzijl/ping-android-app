@@ -25,8 +25,7 @@ public class Logger {
         // Check if enabled in settings.
         SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(context);
-        boolean enabled = sharedPreferences.getBoolean("enable_logging", false);
-        return enabled;
+        return sharedPreferences.getBoolean("enable_logging", false);
     }
 
     // Write a message to the log file.
