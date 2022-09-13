@@ -159,6 +159,7 @@ public class WhitelistActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == RESULT_OK) {
+            //noinspection SwitchStatementWithTooFewBranches
             switch (requestCode) {
                 case CONTACT_PICKER_RESULT:
                     // Handle contact results.

@@ -86,7 +86,7 @@ public class Logger {
             Log.i("Log Files", "Creating logs directory");
             boolean result = logDir.mkdirs();
 
-            if (result == false) {
+            if (!result) {
                 Log.w("Log Files", "Could not create directory.");
                 logDir = documentsDir;
             }

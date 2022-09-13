@@ -109,6 +109,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        //noinspection SwitchStatementWithTooFewBranches
         switch (item.getItemId()) {
             case android.R.id.home:
                 //NavUtils.navigateUpFromSameTask(this);
