@@ -488,6 +488,7 @@ public class ScheduledPingActivity extends AppCompatActivity {
      * Check if rationale should be shown.
      * @return True if rationale should be shown.
      */
+    @SuppressWarnings("SameReturnValue")
     private boolean shouldShowRequestPermissionRationale() {
         return false;
     }

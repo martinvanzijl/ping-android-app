@@ -676,6 +676,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     // Check if permission rationale should be shown.
+    @SuppressWarnings("SameReturnValue")
     private boolean shouldShowRequestPermissionRationale() {
         return false;
     }

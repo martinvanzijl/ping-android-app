@@ -111,6 +111,7 @@ public class WhitelistActivity extends AppCompatActivity {
         return false;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private boolean shouldShowRequestPermissionRationale() {
         return false;
     }

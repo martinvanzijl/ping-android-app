@@ -85,6 +85,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     // Check if permission rationale should be shown.
+    @SuppressWarnings("SameReturnValue")
     private boolean shouldShowRequestPermissionRationale() {
         return false;
     }

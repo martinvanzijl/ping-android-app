@@ -98,6 +98,7 @@ public class OsmMapFragment extends Fragment {
      * Get name for log.
      * @return The name for the log.
      */
+    @SuppressWarnings("SameReturnValue")
     private String getLogId() {
         return "Ping";
     }
