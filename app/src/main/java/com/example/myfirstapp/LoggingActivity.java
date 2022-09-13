@@ -64,8 +64,9 @@ public class LoggingActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressWarnings("unused")
     public void onViewLogsClick(View view) {
-        EditText field = findViewById(R.id.editTextLogs);
+//        EditText field = findViewById(R.id.editTextLogs);
 //        field.setText(Logger.getLogsAsString());
     }
 }

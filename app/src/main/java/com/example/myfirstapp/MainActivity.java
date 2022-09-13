@@ -506,6 +506,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    @SuppressWarnings("unused")
     public void onButtonStartServiceClick(View view) {
 //        Logger.info(this, "Start service button clicked.");
         appendLog("Start service button clicked.");
@@ -534,6 +535,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    @SuppressWarnings("unused")
     public void onButtonStopServiceClick(View view) {
         appendLog("Stop service button clicked.");
 
@@ -734,6 +736,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return sharedPreferences.getBoolean("choose_ping_contact_from_whitelist", false);
     }
 
+    @SuppressWarnings("unused")
     public void onPingButtonClick(View view) {
         // Check for permissions first.
         if (checkForPermission(Manifest.permission.READ_CONTACTS, REQUEST_CODE_PICK_CONTACT)) {
@@ -787,6 +790,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     // Choose allowed contacts.
+    @SuppressWarnings("unused")
     public void onWhitelistButtonClick(View view) {
         Intent intent = new Intent(this, WhitelistActivity.class);
         startActivity(intent);
@@ -878,6 +882,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressWarnings("unused")
     public void onExpandMapClick(View view) {
         toggleMapExpanded();
     }
@@ -936,22 +941,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         stopService(new Intent(this, BroadcastService.class));
     }
 
-    private void requestPermissionsIfNecessary(String[] permissions) {
-        ArrayList<String> permissionsToRequest = new ArrayList<>();
-        for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(this, permission)
-                    != PackageManager.PERMISSION_GRANTED) {
-                // Permission is not granted
-                permissionsToRequest.add(permission);
-            }
-        }
-        if (permissionsToRequest.size() > 0) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    permissionsToRequest.toArray(new String[0]),
-                    OSM_MAP_REQUEST_CODE);
-        }
-    }
+// --Commented out by Inspection START (9/14/2022 8:20 AM):
+//    private void requestPermissionsIfNecessary(String[] permissions) {
+//        ArrayList<String> permissionsToRequest = new ArrayList<>();
+//        for (String permission : permissions) {
+//            if (ContextCompat.checkSelfPermission(this, permission)
+//                    != PackageManager.PERMISSION_GRANTED) {
+//                // Permission is not granted
+//                permissionsToRequest.add(permission);
+//            }
+//        }
+//        if (permissionsToRequest.size() > 0) {
+//            ActivityCompat.requestPermissions(
+//                    this,
+//                    permissionsToRequest.toArray(new String[0]),
+//                    OSM_MAP_REQUEST_CODE);
+//        }
+//    }
+// --Commented out by Inspection STOP (9/14/2022 8:20 AM)
 
     @Override
     protected void onStart() {
