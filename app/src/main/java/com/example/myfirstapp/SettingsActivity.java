@@ -45,6 +45,7 @@ public class SettingsActivity extends AppCompatActivity {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
             SwitchPreferenceCompat loggingPreference = findPreference("enable_logging");
+            assert loggingPreference != null;
             loggingPreference.setOnPreferenceClickListener(preference -> {
 //                    Log.i("Logging", "Preference clicked.");
                 SwitchPreferenceCompat switchPreference = (SwitchPreferenceCompat) preference;
