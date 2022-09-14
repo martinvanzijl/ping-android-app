@@ -59,7 +59,13 @@ public class Logger {
 
             // Create log file if it does not exist.
             if (!logFile.exists()) {
-                logFile.createNewFile();
+                // Try to create the file.
+                boolean result = logFile.createNewFile();
+
+                // Check result.
+                if (!result) {
+                    Log.w("Logging", "Could not create the log file.");
+                }
             }
 
             // Write the message.
