@@ -120,10 +120,4 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    public void onEnableLoggingClick(SwitchPreferenceCompat view) {
-        Log.i("Logging", "Logging click handler called.");
-        if (view.isChecked()) {
-            Log.i("Logging", "Switch is checked.");
-        }
-    }
 }

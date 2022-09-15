@@ -88,6 +88,7 @@ public class WhitelistActivity extends AppCompatActivity {
 //    }
 // --Commented out by Inspection STOP (9/14/2022 8:24 AM)
 
+    @SuppressWarnings("unused")
     public void onButtonAddClick(View view) {
         // Choose a contact.
         if (checkForPermission(Manifest.permission.READ_CONTACTS)) {

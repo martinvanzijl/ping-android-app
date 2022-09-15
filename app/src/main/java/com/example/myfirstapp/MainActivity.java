@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     static final String PING_REQUEST_TEXT = "Sent from Ping App. Where are you?";
     private static final int REQUEST_CODE_PICK_CONTACT = 1000;
     private static final int REQUEST_CODE_START_SERVICE = 1001;
-    private static final int OSM_MAP_REQUEST_CODE = 1002;
+    // --Commented out by Inspection (9/15/2022 1:48 PM):private static final int OSM_MAP_REQUEST_CODE = 1002;
     private GoogleMap mMap = null;
     private MapView map = null;
     private boolean m_usingOSM = true;
