@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -54,6 +53,7 @@ public class LoggingActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        //noinspection SwitchStatementWithTooFewBranches
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
@@ -63,8 +63,9 @@ public class LoggingActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressWarnings("unused")
     public void onViewLogsClick(View view) {
-        EditText field = findViewById(R.id.editTextLogs);
+//        EditText field = findViewById(R.id.editTextLogs);
 //        field.setText(Logger.getLogsAsString());
     }
 }

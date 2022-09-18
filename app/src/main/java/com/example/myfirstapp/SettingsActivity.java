@@ -11,7 +11,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
 
@@ -45,19 +44,18 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
-            SwitchPreferenceCompat preference = findPreference("enable_logging");
-            preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                public boolean onPreferenceClick(Preference preference) {
+            SwitchPreferenceCompat loggingPreference = findPreference("enable_logging");
+            assert loggingPreference != null;
+            loggingPreference.setOnPreferenceClickListener(preference -> {
 //                    Log.i("Logging", "Preference clicked.");
-                    SwitchPreferenceCompat switchPreference = (SwitchPreferenceCompat) preference;
-                    if (switchPreference.isChecked()) {
+                SwitchPreferenceCompat switchPreference = (SwitchPreferenceCompat) preference;
+                if (switchPreference.isChecked()) {
 //                        Log.i("Logging", "Switch is checked.");
-                        if (m_instance != null) {
-                            m_instance.checkWriteFilePermissions();
-                        }
+                    if (m_instance != null) {
+                        m_instance.checkWriteFilePermissions();
                     }
-                    return true;
                 }
+                return true;
             });
         }
     }
@@ -71,6 +69,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     // Check if a single permission is granted.
+    @SuppressWarnings("SameParameterValue")
     private boolean checkForPermission(String permission, int requestCode) {
         if (ContextCompat.checkSelfPermission(
                 getApplicationContext(), permission) ==
@@ -87,6 +86,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     // Check if permission rationale should be shown.
+    @SuppressWarnings("SameReturnValue")
     private boolean shouldShowRequestPermissionRationale() {
         return false;
     }
@@ -109,6 +109,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        //noinspection SwitchStatementWithTooFewBranches
         switch (item.getItemId()) {
             case android.R.id.home:
                 //NavUtils.navigateUpFromSameTask(this);
@@ -119,10 +120,4 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    public void onEnableLoggingClick(SwitchPreferenceCompat view) {
-        Log.i("Logging", "Logging click handler called.");
-        if (view.isChecked()) {
-            Log.i("Logging", "Switch is checked.");
-        }
-    }
 }

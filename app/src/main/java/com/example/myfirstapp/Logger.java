@@ -12,9 +12,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.Locale;
 
 public class Logger {
 
@@ -26,8 +25,7 @@ public class Logger {
         // Check if enabled in settings.
         SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(context);
-        boolean enabled = sharedPreferences.getBoolean("enable_logging", false);
-        return enabled;
+        return sharedPreferences.getBoolean("enable_logging", false);
     }
 
     // Write a message to the log file.
@@ -43,7 +41,7 @@ public class Logger {
 
         // Get the timestamp.
         Date date = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         String timestamp = format.format(date);
 
         // Format the message.
@@ -61,7 +59,13 @@ public class Logger {
 
             // Create log file if it does not exist.
             if (!logFile.exists()) {
-                logFile.createNewFile();
+                // Try to create the file.
+                boolean result = logFile.createNewFile();
+
+                // Check result.
+                if (!result) {
+                    Log.w("Logging", "Could not create the log file.");
+                }
             }
 
             // Write the message.
@@ -85,7 +89,7 @@ public class Logger {
             Log.i("Log Files", "Creating logs directory");
             boolean result = logDir.mkdirs();
 
-            if (result == false) {
+            if (!result) {
                 Log.w("Log Files", "Could not create directory.");
                 logDir = documentsDir;
             }

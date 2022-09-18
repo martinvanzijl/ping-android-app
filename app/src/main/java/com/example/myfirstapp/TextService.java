@@ -25,6 +25,8 @@ import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.CancellationToken;
+import com.google.android.gms.tasks.CancellationTokenSource;
 
 import java.io.IOException;
 import java.util.List;
@@ -52,6 +54,9 @@ public class TextService extends Service {
 
     // Receiver object for text messages.
     final SmsReceiver smsReceiver = new SmsReceiver();
+
+    // Source for cancellation tokens.
+    private final CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
     @Nullable
     @Override
@@ -252,7 +257,9 @@ public class TextService extends Service {
         }
 
         // Try getting the current location.
-        mFusedLocationClient.getCurrentLocation(LocationRequest.QUALITY_HIGH_ACCURACY, null)
+        CancellationToken token = cancellationTokenSource.getToken();
+
+        mFusedLocationClient.getCurrentLocation(LocationRequest.QUALITY_HIGH_ACCURACY, token)
                 .addOnSuccessListener(location -> {
                     System.out.println("Current location gotten");
 

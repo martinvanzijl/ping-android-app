@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     static final String PING_REQUEST_TEXT = "Sent from Ping App. Where are you?";
     private static final int REQUEST_CODE_PICK_CONTACT = 1000;
     private static final int REQUEST_CODE_START_SERVICE = 1001;
-    private static final int OSM_MAP_REQUEST_CODE = 1002;
+    // --Commented out by Inspection (9/15/2022 1:48 PM):private static final int OSM_MAP_REQUEST_CODE = 1002;
     private GoogleMap mMap = null;
     private MapView map = null;
     private boolean m_usingOSM = true;
@@ -83,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             new SimpleDateFormat("hh:mm aa");
     private ActivityResultLauncher<Intent> chooseContactActivity = null;
     private ActivityResultLauncher<Intent> chooseContactFromWhitelistActivity = null;
-    private SharedPreferences.OnSharedPreferenceChangeListener prefListener = null;
     private PingDbHelper dbHelper = null;
 
     @Override
@@ -419,7 +418,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         );
 
         // Create preference listener.
-        prefListener = (preferences, key) -> {
+        SharedPreferences.OnSharedPreferenceChangeListener prefListener = (preferences, key) -> {
             Log.i("Preferences", "Settings key changed: " + key);
 
             // Handle location history preference change.
@@ -428,12 +427,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 boolean showHistoricMarkers = showLocationHistoryEnabled();
 
                 // Show or hide historic markers.
-                for (MarkerProxy marker: mHistoricMarkers) {
+                for (MarkerProxy marker : mHistoricMarkers) {
                     marker.setVisible(showHistoricMarkers);
                 }
 
                 // Always show latest.
-                for (MarkerProxy marker: mLatestMarkers.values()) {
+                for (MarkerProxy marker : mLatestMarkers.values()) {
                     marker.setVisible(true);
                 }
             }
@@ -449,6 +448,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Show a "toast" message.
      * @param message The message.
      */
+    @SuppressWarnings("SameParameterValue")
     protected void showToastMessage(String message) {
         Context context = getApplicationContext();
         int duration = Toast.LENGTH_SHORT;
@@ -506,6 +506,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    @SuppressWarnings("unused")
     public void onButtonStartServiceClick(View view) {
 //        Logger.info(this, "Start service button clicked.");
         appendLog("Start service button clicked.");
@@ -534,6 +535,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    @SuppressWarnings("unused")
     public void onButtonStopServiceClick(View view) {
         appendLog("Stop service button clicked.");
 
@@ -676,6 +678,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     // Check if permission rationale should be shown.
+    @SuppressWarnings("SameReturnValue")
     private boolean shouldShowRequestPermissionRationale() {
         return false;
     }
@@ -733,6 +736,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return sharedPreferences.getBoolean("choose_ping_contact_from_whitelist", false);
     }
 
+    @SuppressWarnings("unused")
     public void onPingButtonClick(View view) {
         // Check for permissions first.
         if (checkForPermission(Manifest.permission.READ_CONTACTS, REQUEST_CODE_PICK_CONTACT)) {
@@ -786,6 +790,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     // Choose allowed contacts.
+    @SuppressWarnings("unused")
     public void onWhitelistButtonClick(View view) {
         Intent intent = new Intent(this, WhitelistActivity.class);
         startActivity(intent);
@@ -848,7 +853,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
@@ -878,6 +882,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressWarnings("unused")
     public void onExpandMapClick(View view) {
         toggleMapExpanded();
     }
@@ -936,22 +941,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         stopService(new Intent(this, BroadcastService.class));
     }
 
-    private void requestPermissionsIfNecessary(String[] permissions) {
-        ArrayList<String> permissionsToRequest = new ArrayList<>();
-        for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(this, permission)
-                    != PackageManager.PERMISSION_GRANTED) {
-                // Permission is not granted
-                permissionsToRequest.add(permission);
-            }
-        }
-        if (permissionsToRequest.size() > 0) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    permissionsToRequest.toArray(new String[0]),
-                    OSM_MAP_REQUEST_CODE);
-        }
-    }
+// --Commented out by Inspection START (9/14/2022 8:20 AM):
+//    private void requestPermissionsIfNecessary(String[] permissions) {
+//        ArrayList<String> permissionsToRequest = new ArrayList<>();
+//        for (String permission : permissions) {
+//            if (ContextCompat.checkSelfPermission(this, permission)
+//                    != PackageManager.PERMISSION_GRANTED) {
+//                // Permission is not granted
+//                permissionsToRequest.add(permission);
+//            }
+//        }
+//        if (permissionsToRequest.size() > 0) {
+//            ActivityCompat.requestPermissions(
+//                    this,
+//                    permissionsToRequest.toArray(new String[0]),
+//                    OSM_MAP_REQUEST_CODE);
+//        }
+//    }
+// --Commented out by Inspection STOP (9/14/2022 8:20 AM)
 
     @Override
     protected void onStart() {

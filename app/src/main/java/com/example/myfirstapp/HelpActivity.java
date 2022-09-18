@@ -2,16 +2,10 @@ package com.example.myfirstapp;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.PreferenceManager;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.webkit.WebView;
-import android.widget.TextView;
-
-import java.io.IOException;
 
 public class HelpActivity extends AppCompatActivity {
 
@@ -33,6 +27,7 @@ public class HelpActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        //noinspection SwitchStatementWithTooFewBranches
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();

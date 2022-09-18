@@ -18,6 +18,7 @@ public final class PingDatabaseContract {
                     WhitelistContactEntry._ID + " INTEGER PRIMARY KEY," +
                     WhitelistContactEntry.COLUMN_NAME_PHONE_NUMBER + " TEXT)";
 
+    @SuppressWarnings("unused")
     static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + WhitelistContactEntry.TABLE_NAME;
 

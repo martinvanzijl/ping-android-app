@@ -34,8 +34,7 @@ public class OsmMapFragment extends Fragment {
      * @return A new instance of fragment OsmMapFragment.
      */
     public static OsmMapFragment newInstance() {
-        OsmMapFragment fragment = new OsmMapFragment();
-        return fragment;
+        return new OsmMapFragment();
     }
 
     @Override
@@ -99,6 +98,7 @@ public class OsmMapFragment extends Fragment {
      * Get name for log.
      * @return The name for the log.
      */
+    @SuppressWarnings("SameReturnValue")
     private String getLogId() {
         return "Ping";
     }

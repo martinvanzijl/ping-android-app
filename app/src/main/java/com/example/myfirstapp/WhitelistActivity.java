@@ -78,14 +78,17 @@ public class WhitelistActivity extends AppCompatActivity {
         return contacts;
     }
 
-    private List<String> generateData() {
-        List<String> data = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            data.add("Example Contact #" + i);
-        }
-        return data;
-    }
+// --Commented out by Inspection START (9/14/2022 8:24 AM):
+//    private List<String> generateData() {
+//        List<String> data = new ArrayList<>();
+//        for (int i = 0; i < 10; i++) {
+//            data.add("Example Contact #" + i);
+//        }
+//        return data;
+//    }
+// --Commented out by Inspection STOP (9/14/2022 8:24 AM)
 
+    @SuppressWarnings("unused")
     public void onButtonAddClick(View view) {
         // Choose a contact.
         if (checkForPermission(Manifest.permission.READ_CONTACTS)) {
@@ -95,6 +98,7 @@ public class WhitelistActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressWarnings("SameParameterValue")
     private boolean checkForPermission(String permission) {
         if (ContextCompat.checkSelfPermission(
                 getApplicationContext(), permission) ==
@@ -110,10 +114,12 @@ public class WhitelistActivity extends AppCompatActivity {
         return false;
     }
 
+    @SuppressWarnings("SameReturnValue")
     private boolean shouldShowRequestPermissionRationale() {
         return false;
     }
 
+    @SuppressWarnings("unused")
     public void onButtonDeleteClick(View view) {
         RecyclerView listView = findViewById(R.id.recyclerViewMain);
         CustomAdapter adapter = (CustomAdapter) listView.getAdapter();
@@ -159,6 +165,7 @@ public class WhitelistActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == RESULT_OK) {
+            //noinspection SwitchStatementWithTooFewBranches
             switch (requestCode) {
                 case CONTACT_PICKER_RESULT:
                     // Handle contact results.
@@ -223,6 +230,7 @@ public class WhitelistActivity extends AppCompatActivity {
         updateListView();
     }
 
+    @SuppressWarnings("unused")
     public void onButtonClearClick(View view) {
         // Update database.
         PingDbHelper database = new PingDbHelper(this);
@@ -232,6 +240,7 @@ public class WhitelistActivity extends AppCompatActivity {
         updateListView();
     }
 
+    @SuppressWarnings("unused")
     public void onButtonMainScreenClick(View view) {
         finish();
     }
@@ -245,6 +254,7 @@ public class WhitelistActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressWarnings("unused")
     public void onRecyclerViewMainClick(View view) {
         Log.i("Ping", "Recycler view clicked.");
 
