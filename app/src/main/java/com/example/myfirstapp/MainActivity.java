@@ -14,11 +14,13 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
+import android.provider.Settings;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
@@ -532,6 +534,39 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Start the service if these are granted.
         if (checkForPermissions(requiredPermissions, REQUEST_CODE_START_SERVICE)) {
             startService(new Intent(this, TextService.class));
+        }
+
+        // Give warning if location services are disabled.
+        warnIfLocationServicesDisabled();
+    }
+
+    /**
+     * Check if location services are enabled on this phone.
+     * @param context The app context.
+     * @return True if location services are enabled.
+     * From: https://stackoverflow.com/questions/10311834/how-to-check-if-location-services-are-enabled/54648795#54648795
+     */
+    @SuppressWarnings("deprecation")
+    public static Boolean isLocationEnabled(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            // This is a new method provided in API 28
+            LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+            return lm.isLocationEnabled();
+        } else {
+            // This was deprecated in API 28
+            int mode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE,
+                    Settings.Secure.LOCATION_MODE_OFF);
+            return (mode != Settings.Secure.LOCATION_MODE_OFF);
+        }
+    }
+
+    /**
+     * Warn the user if location services on the phone is disabled.
+     */
+    private void warnIfLocationServicesDisabled() {
+        if (!isLocationEnabled(this)) {
+            showMessageDialog("Location services are disabled. To ensure that the phone's " +
+                    "location is sent in ping replies, enable the setting, then restart the app.");
         }
     }
 
