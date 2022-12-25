@@ -8,6 +8,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -399,6 +400,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
                         Intent data = result.getData();
                         assert data != null;
+                        choosePingType();
                         pingPhone(data);
                     }
                 }
@@ -444,6 +446,39 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         prefs.registerOnSharedPreferenceChangeListener(prefListener);
 
         dbHelper = new PingDbHelper(this);
+    }
+
+    // Store the selected value.
+    PingType chosenPingType = PingType.ONCE;
+
+    /**
+     * Choose what type of ping to send (single or recurring).
+     * @return The type of ping to send.
+     */
+    PingType choosePingType() {
+        // Build the dialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Choose Ping Type");
+        builder.setMessage("Send a single message or recurring messages?");
+
+        // Add the buttons.
+        // TODO: The items are not displayed at all.
+        // Use a dialog fragment instead, so I can see the layout
+        // at design-time.
+        builder.setItems(R.array.ping_types, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int index) {
+                chosenPingType = PingType.fromInt(index);
+            }
+        });
+
+        // Create the AlertDialog.
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Return.
+        Log.i("Ping", "Returning ping type.");
+        return chosenPingType;
     }
 
     /**
