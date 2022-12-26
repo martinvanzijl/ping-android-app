@@ -80,5 +80,8 @@
     <string name="label_time_left">Running. Next ping request in %1$s…</string>
     <string name="label_send_ping_to">Send a ping request to: %1$s</string>
     <string name="log_text_view_hint">The logs will show here.</string>
-<!--    <string name="button_clear_label">Clear</string>-->
+    <string name="ping_type_dialog_title">Choose Ping Type</string>
+    <string name="ping_type_once">Once</string>
+    <string name="ping_type_recurring">Recurring</string>
+    <!--    <string name="button_clear_label">Clear</string>-->
 </resources>

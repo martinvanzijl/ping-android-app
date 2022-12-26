@@ -40,6 +40,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -456,25 +457,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      * @return The type of ping to send.
      */
     PingType choosePingType() {
-        // Build the dialog.
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Choose Ping Type");
-        builder.setMessage("Send a single message or recurring messages?");
-
-        // Add the buttons.
-        // TODO: The items are not displayed at all.
-        // Use a dialog fragment instead, so I can see the layout
-        // at design-time.
-        builder.setItems(R.array.ping_types, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int index) {
-                chosenPingType = PingType.fromInt(index);
-            }
-        });
-
-        // Create the AlertDialog.
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new PingTypeDialogFragment();
+        dialog.show(getSupportFragmentManager(), "PingTypeDialogFragment");
 
         // Return.
         Log.i("Ping", "Returning ping type.");
