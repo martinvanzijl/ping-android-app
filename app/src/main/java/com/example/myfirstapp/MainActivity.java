@@ -66,7 +66,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback,
+        PingTypeDialogFragment.PingTypeDialogListener {
 
     public static final String PING_REPLY_START = "Ping reply.";
     static final String CHANNEL_ID = "PING_CHANNEL";
@@ -92,6 +93,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
+    }
+
+    @Override
+    public void onOnceClick(DialogFragment dialog) {
+        Log.i("Ping", "Once was clicked, handled by Main Activity.");
+    }
+
+    @Override
+    public void onRecurringClick(DialogFragment dialog) {
+        Log.i("Ping", "Recurring was clicked, handled by Main Activity.");
     }
 
     // Receives messages from the service.

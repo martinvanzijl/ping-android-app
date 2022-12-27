@@ -2,6 +2,7 @@ package com.example.myfirstapp;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,32 @@ import androidx.fragment.app.DialogFragment;
  * create an instance of this fragment.
  */
 public class PingTypeDialogFragment extends DialogFragment {
+
+    /* The activity that creates an instance of this dialog fragment must
+     * implement this interface in order to receive event callbacks.
+     * Each method passes the DialogFragment in case the host needs to query it. */
+    public interface PingTypeDialogListener {
+        public void onOnceClick(DialogFragment dialog);
+        public void onRecurringClick(DialogFragment dialog);
+    }
+
+    // Use this instance of the interface to deliver action events
+    PingTypeDialogListener listener;
+
+    // Override the Fragment.onAttach() method to instantiate the NoticeDialogListener
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        // Verify that the host activity implements the callback interface
+        try {
+            // Instantiate the NoticeDialogListener so we can send events to the host
+            listener = (PingTypeDialogListener) context;
+        } catch (ClassCastException e) {
+            // The activity doesn't implement the interface, throw exception
+            throw new ClassCastException(context.toString()
+                    + " must implement PingTypeDialogListener");
+        }
+    }
 
     public PingTypeDialogFragment() {
         // Required empty public constructor
@@ -37,8 +64,8 @@ public class PingTypeDialogFragment extends DialogFragment {
     }
 
     private void onButtonRecurringClick(View view) {
-        Log.i(getLogName(), "Recurring clicked.");
-        PingTypeDialogFragment.this.getDialog().cancel();
+        listener.onRecurringClick(this);
+        dismiss();
     }
 
     private String getLogName() {
@@ -46,8 +73,8 @@ public class PingTypeDialogFragment extends DialogFragment {
     }
 
     private void onButtonOnceClick(View view) {
-        Log.i(getLogName(), "Once clicked.");
-        PingTypeDialogFragment.this.getDialog().cancel();
+        listener.onOnceClick(this);
+        dismiss();
     }
 
     @Override
@@ -63,12 +90,6 @@ public class PingTypeDialogFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.fragment_ping_type_dialog, null);
         builder.setView(view)
                 // Add action buttons
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        // sign in the user ...
-                    }
-                })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         PingTypeDialogFragment.this.getDialog().cancel();
