@@ -18,12 +18,14 @@ import androidx.fragment.app.DialogFragment;
  */
 public class PingTypeDialogFragment extends DialogFragment {
 
+    static final String CONTACT_NUMBER = "CONTACT_NUMBER";
+
     /* The activity that creates an instance of this dialog fragment must
      * implement this interface in order to receive event callbacks.
      * Each method passes the DialogFragment in case the host needs to query it. */
     public interface PingTypeDialogListener {
-        public void onOnceClick(DialogFragment dialog);
-        public void onRecurringClick(DialogFragment dialog);
+        void onOnceClick(DialogFragment dialog);
+        void onRecurringClick(DialogFragment dialog);
     }
 
     // Use this instance of the interface to deliver action events
@@ -54,8 +56,14 @@ public class PingTypeDialogFragment extends DialogFragment {
      *
      * @return A new instance of fragment PingTypeDialogFragment.
      */
-    public static PingTypeDialogFragment newInstance() {
-        return new PingTypeDialogFragment();
+    public static PingTypeDialogFragment newInstance(String contactNumber) {
+        PingTypeDialogFragment fragment = new PingTypeDialogFragment();
+
+        Bundle args = new Bundle();
+        args.putString(CONTACT_NUMBER, contactNumber);
+        fragment.setArguments(args);
+
+        return fragment;
     }
 
     @Override
