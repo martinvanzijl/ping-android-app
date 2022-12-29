@@ -46,6 +46,9 @@ public class ScheduledPingActivity extends AppCompatActivity {
     private static final SimpleDateFormat SHORT_TIMESTAMP_FORMAT =
             new SimpleDateFormat("hh:mm aa");
 
+    // Intent constants.
+    static final String INTENT_CONTACT_NUMBER = "INTENT_CONTACT_NUMBER";
+
     // Fields.
     private ActivityResultLauncher<Intent> chooseContactActivity = null;
     private ActivityResultLauncher<Intent> chooseContactFromWhitelistActivity = null;
@@ -197,6 +200,18 @@ public class ScheduledPingActivity extends AppCompatActivity {
             // "Start" button.
             Button button = findViewById(R.id.buttonScheduleSave);
             button.setText(R.string.button_schedule_restart_label);
+        }
+
+        // Read the intent.
+        // TODO: What if a scheduled Ping is already running?
+        // Must the app cancel it?
+        // Must it ask the user whether to cancel it or not?
+        Intent intent = getIntent();
+        if (intent.hasExtra(INTENT_CONTACT_NUMBER)) {
+            // Read contact number.
+            m_contactNumber = intent.getStringExtra(INTENT_CONTACT_NUMBER);
+            String contactName = MainActivity.getContactName(m_contactNumber, this);
+            updateContactLabel(contactName);
         }
     }
 

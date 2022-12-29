@@ -8,6 +8,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -39,6 +40,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -64,7 +66,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback,
+        PingTypeDialogFragment.PingTypeDialogListener {
 
     public static final String PING_REPLY_START = "Ping reply.";
     static final String CHANNEL_ID = "PING_CHANNEL";
@@ -90,6 +93,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
+    }
+
+    @Override
+    public void onOnceClick(DialogFragment dialog) {
+        assert dialog.getArguments() != null;
+        String number = dialog.getArguments().getString(PingTypeDialogFragment.CONTACT_NUMBER);
+        sendPingRequest(number);
+    }
+
+    @Override
+    public void onRecurringClick(DialogFragment dialog) {
+        // Get contact number.
+        assert dialog.getArguments() != null;
+        String number = dialog.getArguments().getString(PingTypeDialogFragment.CONTACT_NUMBER);
+
+        // Show "scheduled pings" screen.
+        Intent intent = new Intent(this, ScheduledPingActivity.class);
+        intent.putExtra(ScheduledPingActivity.INTENT_CONTACT_NUMBER, number);
+        startActivity(intent);
     }
 
     // Receives messages from the service.
@@ -399,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
                         Intent data = result.getData();
                         assert data != null;
-                        pingPhone(data);
+                        choosePingType( getPhoneNumber(data) );
                     }
                 }
         );
@@ -444,6 +466,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         prefs.registerOnSharedPreferenceChangeListener(prefListener);
 
         dbHelper = new PingDbHelper(this);
+    }
+
+    // Store the selected value.
+    PingType chosenPingType = PingType.ONCE;
+
+    /**
+     * Choose what type of ping to send (single or recurring).
+     * @return The type of ping to send.
+     */
+    PingType choosePingType(String contactNumber) {
+        // Create an instance of the dialog fragment and show it.
+        DialogFragment dialog = PingTypeDialogFragment.newInstance(contactNumber);
+        dialog.show(getSupportFragmentManager(), "PingTypeDialogFragment");
+
+        // Return.
+        Log.i("Ping", "Returning ping type.");
+        return chosenPingType;
     }
 
     /**
@@ -546,7 +585,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      * @return True if location services are enabled.
      * From: https://stackoverflow.com/questions/10311834/how-to-check-if-location-services-are-enabled/54648795#54648795
      */
-    @SuppressWarnings("deprecation")
     public static Boolean isLocationEnabled(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             // This is a new method provided in API 28
@@ -781,6 +819,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // Ping the phone from the given data.
     private void pingPhone(Intent data) {
+        String number = getPhoneNumber(data);
+        if (!number.isEmpty()) {
+            sendPingRequest(number);
+        }
+    }
+
+    /**
+     * Find the phone number for the given data.
+     * @param data The contact data.
+     */
+    private String getPhoneNumber(Intent data) {
+        String number = "";
+
         Uri uri = data.getData();
         if (uri != null) {
             Cursor cursor = null;
@@ -794,9 +845,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (cursor != null && cursor.moveToFirst()) {
                     String columnName = ContactsContract.CommonDataKinds.Phone.NUMBER;
                     int columnIndex = cursor.getColumnIndex(columnName);
-                    String number = cursor.getString(columnIndex);
-                    System.out.println("Number is: " + number);
-                    sendPingRequest(number);
+                    number = cursor.getString(columnIndex);
                 }
             }
             catch (SQLiteException | SecurityException | IllegalArgumentException e) {
@@ -807,6 +856,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         }
+
+        return number;
     }
 
     // Send a Ping request to the given number.
@@ -820,7 +871,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             view.setText(labelMessage);
         }
         catch (SecurityException e) {
-            System.out.println(e.getLocalizedMessage());
+            Log.w("Ping", e.getLocalizedMessage());
+            // TODO: Show alert for this.
         }
     }
 
