@@ -97,16 +97,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onOnceClick(DialogFragment dialog) {
-        Log.i("Ping", "Once was clicked, handled by Main Activity.");
         assert dialog.getArguments() != null;
         String number = dialog.getArguments().getString(PingTypeDialogFragment.CONTACT_NUMBER);
         sendPingRequest(number);
-        Log.i("Ping", "Tried to send to " + number);
     }
 
     @Override
     public void onRecurringClick(DialogFragment dialog) {
-        Log.i("Ping", "Recurring was clicked, handled by Main Activity.");
+        // Get contact number.
+        assert dialog.getArguments() != null;
+        String number = dialog.getArguments().getString(PingTypeDialogFragment.CONTACT_NUMBER);
+
+        // Show "scheduled pings" screen.
+        Intent intent = new Intent(this, ScheduledPingActivity.class);
+        intent.putExtra(ScheduledPingActivity.INTENT_CONTACT_NUMBER, number);
+        startActivity(intent);
     }
 
     // Receives messages from the service.
