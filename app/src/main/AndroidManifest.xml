@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.myfirstapp">
+    package="com.martinvz.ping">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -26,15 +26,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyFirstApp">
         <activity
-            android:name=".ScheduledPingActivity"
+            android:name="com.martinvz.ping.ScheduledPingActivity"
             android:exported="true"
             android:label="@string/title_activity_scheduled_ping" />
         <activity
-            android:name=".LocationHistoryActivity"
+            android:name="com.martinvz.ping.LocationHistoryActivity"
             android:exported="true"
             android:label="@string/title_activity_location_history" />
         <activity
-            android:name=".HelpActivity"
+            android:name="com.martinvz.ping.HelpActivity"
             android:exported="true"
             android:label="@string/action_help" />
 <!--        <activity-->
@@ -42,11 +42,11 @@
 <!--            android:exported="true"-->
 <!--            android:label="@string/title_activity_logging" />-->
         <activity
-            android:name=".SettingsActivity"
+            android:name="com.martinvz.ping.SettingsActivity"
             android:exported="true"
             android:label="@string/title_activity_settings" />
         <activity
-            android:name=".WhitelistActivity"
+            android:name="com.martinvz.ping.WhitelistActivity"
             android:exported="true"
             android:label="@string/title_activity_whitelist" />
 
@@ -58,17 +58,17 @@
             android:value="@string/google_maps_key" />
 
         <service
-            android:name=".TextService"
+            android:name="com.martinvz.ping.TextService"
             android:enabled="true"
             android:exported="false" />
 
         <service
-            android:name=".BroadcastService"
+            android:name="com.martinvz.ping.BroadcastService"
             android:enabled="true"
             android:exported="false" />
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.martinvz.ping.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,4 +1,4 @@
-package com.example.myfirstapp;
+package com.martinvz.ping;
 
 import org.testng.annotations.Test;
 
