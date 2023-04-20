@@ -55,7 +55,7 @@
             android:resource="@xml/automotive_app_desc" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:value="${MAPS_API_KEY}" />
 
         <service
             android:name="com.martinvz.ping.TextService"
