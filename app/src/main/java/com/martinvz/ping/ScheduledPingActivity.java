@@ -1,4 +1,4 @@
-package com.example.myfirstapp;
+package com.martinvz.ping;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;

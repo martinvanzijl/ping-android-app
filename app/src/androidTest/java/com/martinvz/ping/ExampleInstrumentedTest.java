@@ -1,4 +1,4 @@
-package com.example.myfirstapp;
+package com.martinvz.ping;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;

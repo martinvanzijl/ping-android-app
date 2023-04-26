@@ -1,4 +1,4 @@
-package com.example.myfirstapp;
+package com.martinvz.ping;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -1043,7 +1043,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Replace whatever is in the fragment_container view with this fragment
         if (m_usingOSM) {
-            transaction.add(R.id.map, com.example.myfirstapp.OsmMapFragment.class, null);
+            transaction.add(R.id.map, com.martinvz.ping.OsmMapFragment.class, null);
         } else {
             transaction.add(R.id.map, com.google.android.gms.maps.SupportMapFragment.class, null);
         }

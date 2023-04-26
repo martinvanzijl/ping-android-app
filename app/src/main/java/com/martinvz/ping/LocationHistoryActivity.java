@@ -1,4 +1,4 @@
-package com.example.myfirstapp;
+package com.martinvz.ping;
 
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;

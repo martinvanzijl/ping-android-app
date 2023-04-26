@@ -1,4 +1,4 @@
-package com.example.myfirstapp;
+package com.martinvz.ping;
 
 /**
  * Proxy class for map markers, to enable handling Google Maps and OSM.
